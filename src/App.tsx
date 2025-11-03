@@ -5,7 +5,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Login from './pages/Login'; 
 import Register from './pages/Register'; 
-import CustomerList from './pages/CustomerList'; 
+import CustomerList from './pages/CustomerList';
+import CustomerDetail from './pages/CustomerDetail';
 import NotFound from './pages/NotFound';
 
 import './styles/App.css'; 
@@ -38,9 +39,15 @@ const App: React.FC = () => {
         <Route 
           path="/customers" 
           element={
-            <ProtectedRoute>
-              <CustomerList /> 
-            </ProtectedRoute>
+            //<ProtectedRoute>
+              <AppLayout>
+                <Routes> 
+                  <Route path="/" element={<Navigate to="/customers" replace />} />
+                  <Route path="/customers" element={<CustomerList />} />
+                  <Route path="/customers/:id" element={<CustomerDetail />} />
+                </Routes>
+              </AppLayout>
+            //</ProtectedRoute>
           } 
         />
         

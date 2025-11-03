@@ -1,0 +1,149 @@
+.customer-list-container {
+  width: 100%;
+}
+.toolbar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.search-input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.filter-select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+.add-button {
+  padding: 10px 20px;
+  background-color: #555; 
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.loading-state, .error-state, .empty-state {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #777;
+}
+.customer-detail-content {
+    background-color: #fff; /* Nền trắng cho phần nội dung chính */
+    padding: 24px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.customer-detail-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 24px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eee;
+}
+
+.customer-avatar-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #555; /* Dùng lại màu của nút để đồng bộ */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 600;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.customer-info .customer-name {
+    font-size: 24px;
+    margin: 0 0 4px 0;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Breadcrumb styling */
+.breadcrumb-list {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+.breadcrumb-item a {
+    color: #555;
+    text-decoration: none;
+}
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+.breadcrumb-item.active {
+    color: #111;
+}
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    padding: 0 8px;
+    color: #888;
+}
+
+.header-actions {
+    margin-left: auto;
+}
+
+/* Tabs */
+.customer-detail-tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    color: #555;
+    font-size: 15px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+}
+
+.tab-item.active {
+    color: #000;
+    font-weight: 600;
+    border-bottom-color: #555;
+}
+
+/* Tab Content */
+.customer-detail-tab-content {
+    padding-top: 24px;
+}
+
+.card-style {
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+}
+
+.info-block {
+    margin-bottom: 20px;
+}
+.info-block:last-child {
+    margin-bottom: 0;
+}
+.info-block label {
+    display: block;
+    color: #777;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+.info-block span {
+    font-size: 16px;
+    color: #333;
+}
