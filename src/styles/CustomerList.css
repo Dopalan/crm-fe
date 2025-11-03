@@ -1,0 +1,35 @@
+.customer-list-container {
+  width: 100%;
+}
+.toolbar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.search-input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.filter-select {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+}
+.add-button {
+  padding: 10px 20px;
+  background-color: #555; 
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.loading-state, .error-state, .empty-state {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #777;
+}
