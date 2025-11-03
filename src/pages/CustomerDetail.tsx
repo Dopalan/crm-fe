@@ -33,7 +33,6 @@ const CustomerDetail: React.FC = () => {
                         </nav>
                     </div>
                     <div className="header-actions">
-                        {/* Sử dụng lại class "add-button" cho đồng bộ */}
                         <button className="add-button">Edit</button>
                     </div>
                 </div>

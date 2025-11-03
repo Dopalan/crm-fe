@@ -7,7 +7,7 @@ interface CustomerTableProps {
   customers: Customer[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
-  onRowClick: (id: string) => void; // Prop này đã có sẵn, rất tốt!
+  onRowClick: (id: string) => void; 
 }
 
 const CustomerTable: React.FC<CustomerTableProps> = ({

@@ -1,0 +1,58 @@
+/* src/styles/Sidebar.css */
+
+.sidebar {
+  width: 250px;
+  min-height: 100vh; /* Đảm bảo Sidebar chiếm toàn bộ chiều cao */
+  background-color: #000000; /* Màu đen tuyền như trong ảnh */
+  color: #FFFFFF; /* Màu chữ/icon mặc định là trắng */
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px 24px;
+  font-size: 2rem; 
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid #FFFFFF; 
+}
+
+.sidebar-nav {
+  flex-grow: 1; 
+}
+
+.sidebar-link {
+  display: flex; 
+  align-items: center; 
+  gap: 16px; 
+  
+  padding: 16px 24px;
+  color: #FFFFFF;
+  text-decoration: none;
+  font-size: 1.2rem;
+  
+  border-bottom: 1px solid #333; 
+}
+
+.sidebar-link:hover {
+  background-color: #222;
+}
+
+.sidebar-link.active {
+  background-color: #888888; 
+  color: #FFFFFF;
+  font-weight: bold;
+  border-bottom: 1px solid #FFFFFF;
+}
+
+.sidebar-link svg {
+  font-size: 1.5rem; 
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  display: none; 
+}
+.logout-button {
+  display: none;
+}
