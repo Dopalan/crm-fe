@@ -1,6 +1,10 @@
-// Interface tạm thời
-export interface Customer {
-  id: string;
+export interface ApiResponse<T> {
+  message: string;
+  result: T;
+}
+
+export interface CustomerResponse {
+  id: number; 
   fullName: string;
   company: string;
   location: string;
@@ -8,23 +12,34 @@ export interface Customer {
   job: string; 
   profilePictureUrl?: string; 
   phoneNumber?: string;
+
 }
 
-// Định nghĩa cho tham số Truy vấn khi lấy danh sách
+
+export interface CustomerRequest {
+  fullName: string;
+  company: string;
+  location: string;
+  emailAddress: string;
+  job: string; 
+  phoneNumber?: string;
+}
+
+
+export interface CustomerListResponse {
+  content: CustomerResponse[];
+  totalPages: number;
+  totalElements: number;
+  currentPage: number; 
+  pageSize: number;
+}
+
+
 export interface CustomerListQuery {
   page: number;
   pageSize: number;
   searchTerm?: string;
-  filterJob?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
-
-// Định nghĩa cho phản hồi (Response) từ API danh sách
-export interface CustomerListResponse {
-  content: Customer[];
-  totalPages: number;
-  totalElements: number;
-  currentPage: number;
-  pageSize: number;
+  filterJob?: string; 
+  sortBy?: string; 
+  sortDir?: 'asc' | 'desc'; 
 }

@@ -1,12 +1,12 @@
 // src/components/customer/CustomerTable.tsx
 import React from 'react';
-import type { Customer } from '../../types/customer.d';
+import type { CustomerResponse } from '../../types/customer.d';
 import '../../styles/CustomerTable.css'; 
 
 interface CustomerTableProps {
-  customers: Customer[];
-  onEdit: (id: string) => void;
-  onDelete: (id: string) => void;
+  customers: CustomerResponse[];
+  onEdit: (id: number) => Promise<void>; 
+  onDelete: (id: number) => Promise<void>;
 }
 
 const CustomerTable: React.FC<CustomerTableProps> = ({
@@ -46,10 +46,8 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
               <td>{customer.job}</td>
               <td>
                 <div className="action-buttons">
-                  <button onClick={() => onEdit(customer.id)} className="action-btn edit">
-                  </button>
-                  <button onClick={() => onDelete(customer.id)} className="action-btn delete">
-                  </button>
+                  <button onClick={() => onEdit(customer.id)} className="action-btn edit"></button>
+                  <button onClick={() => onDelete(customer.id)} className="action-btn delete"></button>
                 </div>
               </td>
             </tr>

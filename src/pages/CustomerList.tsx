@@ -1,6 +1,7 @@
 // src/pages/CustomerList.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCustomerData } from '../hooks/useCustomerData';
+import { getFilterOptions, deleteCustomer } from '../api/customer';
 import CustomerTable from '../components/customer/CustomerTable';
 import Pagination from '../components/common/Pagination';
 import '../styles/CustomerList.css'; 
@@ -10,12 +11,14 @@ const INITIAL_PAGE_SIZE = 10;
 const CustomerList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterJob, setFilterJob] = useState('All');
+  const [jobOptions, setJobOptions] = useState<string[]>([]);
 
   const {
     customers,
     loading,
     error,
     pagination,
+    refetch,
     setQueryParam,
   } = useCustomerData({
     page: 0, 
@@ -38,13 +41,36 @@ const CustomerList: React.FC = () => {
     setQueryParam('page', newPage);
   };
 
-  const handleEdit = (id: string) => {
-    console.log('Edit customer:', id);
-  };
 
-  const handleDelete = (id: string) => {
-    console.log('Delete customer:', id);
-  };
+  const handleEdit = async (id: number) => {
+      try {
+        // const customerDetails = await getCustomerById(id);
+        // setEditingCustomer(customerDetails);
+        // setIsModalOpen(true);
+        console.log('Edit customer with ID:', id);
+      } catch (error) {
+        alert('Không thể tải thông tin chi tiết.');
+      }
+    };
+
+const handleDelete = async (id: number) => { 
+  if (window.confirm('Bạn có chắc chắn muốn xóa khách hàng này không?')) {
+    try {
+      await deleteCustomer(id); // Bây giờ id (number) đã khớp
+      alert('Đã xóa thành công!');
+      refetch(); 
+    } catch (err) {
+      alert('Xóa thất bại. Vui lòng thử lại.');
+    }
+  }
+};
+  useEffect(() => {
+    const fetchJobOptions = async () => {
+      const options = await getFilterOptions();
+      setJobOptions(options);
+    };
+    fetchJobOptions();
+  }, []);
 
   return (
     <div className="customer-list-container">
@@ -57,15 +83,17 @@ const CustomerList: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleSearch}
         />
-        <select 
-          className="filter-select" 
-          value={filterJob} 
+        <select
+          className="filter-select"
+          value={filterJob}
           onChange={handleFilterChange}
         >
           <option value="All">Job: All</option>
-          <option value="A">Job: A</option>
-          <option value="B">Job: B</option>
-          <option value="C">Job: C</option>
+          {jobOptions.map((job) => (
+            <option key={job} value={job}>
+              Job: {job}
+            </option>
+          ))}
         </select>
         <button className="add-button">
           Add
@@ -78,7 +106,7 @@ const CustomerList: React.FC = () => {
       {!loading && !error && customers.length > 0 && (
         <CustomerTable
           customers={customers}
-          onEdit={handleEdit}
+          onEdit={handleEdit} 
           onDelete={handleDelete}
         />
       )}

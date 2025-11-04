@@ -1,11 +1,9 @@
-// src/hooks/useCustomerData.ts
-
 import { useState, useEffect, useCallback } from 'react';
-import { getCustomerList } from '../api/customer';
-import type { Customer, CustomerListQuery, CustomerListResponse } from '../types/customer.d';
+import { getCustomerList, searchCustomers } from '../api/customer'; 
+import type { CustomerResponse, CustomerListQuery } from '../types/customer.d';
 
 export const useCustomerData = (initialQuery: CustomerListQuery) => {
-  const [data, setData] = useState<Customer[]>([]);
+  const [data, setData] = useState<CustomerResponse[]>([]); 
   const [query, setQuery] = useState<CustomerListQuery>(initialQuery);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,21 +18,40 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
     setLoading(true);
     setError(null);
     try {
-      const response: CustomerListResponse = await getCustomerList(query);
-      setData(response.content);
-      setPagination({
-        totalPages: response.totalPages,
-        totalElements: response.totalElements,
-        currentPage: response.currentPage,
-        pageSize: response.pageSize,
-      });
+      if (query.searchTerm && query.searchTerm.trim() !== '') {
+        const searchResult = await searchCustomers(query.searchTerm);
+        setData(searchResult);
+        setPagination({
+          totalPages: 1,
+          totalElements: searchResult.length,
+          currentPage: 0,
+          pageSize: searchResult.length > 0 ? searchResult.length : initialQuery.pageSize,
+        });
+
+      } else {
+
+        const pageQuery: CustomerListQuery = {
+          page: query.page,
+          pageSize: query.pageSize,
+          sortBy: query.sortBy,
+          sortDir: query.sortDir,
+        };
+        const response = await getCustomerList(pageQuery);
+        setData(response.content);
+        setPagination({
+          totalPages: response.totalPages,
+          totalElements: response.totalElements,
+          currentPage: response.currentPage,
+          pageSize: response.pageSize,
+        });
+      }
     } catch (err) {
       setError('Lỗi khi tải dữ liệu khách hàng. Vui lòng thử lại.');
       setData([]);
     } finally {
       setLoading(false);
     }
-  }, [query]); 
+  }, [query]);
 
   useEffect(() => {
     fetchCustomers();
