@@ -1,20 +1,35 @@
 // src/components/common/AppLayout.tsx
 import React from 'react';
-import Sidebar from './Sidebar';
-import '../../styles/Layout.css'; 
+import { Layout, Menu } from 'antd';
+import { Outlet, useNavigate } from 'react-router-dom'; // ✅ BƯỚC 1: IMPORT OUTLET
+import { HomeOutlined } from '@ant-design/icons';
 
-interface AppLayoutProps {
-  children: React.ReactNode;
-}
+const { Sider, Content } = Layout;
 
-const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+// ✅ BƯỚC 2: ĐƠN GIẢN HÓA COMPONENT, KHÔNG CẦN "children"
+const AppLayout: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="app-layout">
-      <Sidebar />
-      <main className="main-content">
-        {children}
-      </main>
-    </div>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider width={200} theme="dark">
+        <div style={{ height: '32px', margin: '16px', color: 'white', textAlign: 'center', fontSize: '20px' }}>
+          CRM
+        </div>
+        <Menu theme="dark" mode="inline" defaultSelectedKeys={['home']}>
+          <Menu.Item key="home" icon={<HomeOutlined />} onClick={() => navigate('/customers')}>
+            Home
+          </Menu.Item>
+          {/* Các menu item khác có thể thêm vào đây */}
+        </Menu>
+      </Sider>
+      <Layout>
+        <Content style={{ padding: '24px', background: '#f0f2f5' }}>
+          {/* ✅ BƯỚC 3: OUTLET LÀ NƠI CÁC TRANG CON SẼ ĐƯỢC HIỂN THỊ */}
+          <Outlet />
+        </Content>
+      </Layout>
+    </Layout>
   );
 };
 
