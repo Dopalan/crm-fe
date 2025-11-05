@@ -1,15 +1,19 @@
 // src/pages/CustomerList.tsx
 import React, { useState } from 'react';
 import { useCustomerData } from '../hooks/useCustomerData';
+import { createCustomer } from '../api/customer';
 import CustomerTable from '../components/customer/CustomerTable';
+import CustomerForm from '../components/customer/CustomerForm';
 import Pagination from '../components/common/Pagination';
 import '../styles/CustomerList.css'; 
+import type { Customer } from '../types/customer';
 
 const INITIAL_PAGE_SIZE = 10;
 
 const CustomerList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterJob, setFilterJob] = useState('All');
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const {
     customers,
@@ -46,6 +50,30 @@ const CustomerList: React.FC = () => {
     console.log('Delete customer:', id);
   };
 
+  const handleAdd = () => {
+    setShowAddForm(true);
+  };
+
+  const handleFormSubmit = async (customerData: Omit<Customer, 'id'>) => {
+    try {
+      const newCustomer = await createCustomer(customerData);
+      console.log('Customer created successfully:', newCustomer);
+      
+      setShowAddForm(false);
+      setQueryParam('page', 0);
+
+      alert('Customer added successfully!');
+      
+    } catch (error: any) {
+      console.error('Error creating customer:', error);
+      alert(`An error occurred while adding the customer: ${error.message}`);
+    }
+  };
+
+  const handleFormCancel = () => {
+    setShowAddForm(false);
+  };
+
   return (
     <div className="customer-list-container">
       <div className="toolbar">
@@ -67,7 +95,7 @@ const CustomerList: React.FC = () => {
           <option value="B">Job: B</option>
           <option value="C">Job: C</option>
         </select>
-        <button className="add-button">
+        <button className="add-button" onClick={handleAdd}>
           Add
         </button>
       </div>
@@ -92,6 +120,13 @@ const CustomerList: React.FC = () => {
           currentPage={pagination.currentPage}
           totalPages={pagination.totalPages}
           onPageChange={handlePageChange}
+        />
+      )}
+
+      {showAddForm && (
+        <CustomerForm
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
         />
       )}
     </div>

@@ -10,6 +10,33 @@ export interface Customer {
   phoneNumber?: string;
 }
 
+// API customer request 
+export interface CustomerRequest {
+  name: string;
+  email?: string;
+  phone?: string;
+  company: string;
+  notes?: string;
+  profilePicture?: string;
+  teamId?: number;
+  createdBy?: number;
+}
+
+// API customer response
+export interface CustomerResponse {
+  id: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  company: string;
+  notes?: string;
+  profilePicture?: string;
+  teamId: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Định nghĩa cho tham số Truy vấn khi lấy danh sách
 export interface CustomerListQuery {
   page: number;
