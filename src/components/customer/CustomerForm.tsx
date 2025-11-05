@@ -1,40 +1,40 @@
 import React, {useState} from "react";
-import type { Customer } from "../../types/customer";
+import type { Customer, CustomerBE } from "../../types/customer";
 import "../../styles/CustomerForm.css";
 
 
 interface CustomerFormProps {
-  onSubmit: (customerData: Omit<Customer, "id">) => void;
+  onSubmit: (customerData: Omit<CustomerBE, "id">) => void;
   onCancel: () => void;
 }
 
 const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
-    const [customerData, setCustomerData] = useState<Omit<Customer, "id">>({
-        fullName: '',
+    const [customerData, setCustomerData] = useState<Omit<CustomerBE, "id">>({
+        name: '',
         company: '',
-        location: '',
-        emailAddress: '',
-        job: '',
-        phoneNumber: '',
-        profilePictureUrl: '',
-        status: '',
+        // location: '',
+        email: '',
+        // job: '',
+        phone: '',
+        profilePicture: '',
+        // status: '',
         notes: [],
         teamId: 0,
         createdBy: 0,
         createdAt: '',
         updatedAt: '',
     });
-    const [errors, setErrors] = useState<Partial<Omit<Customer, "id">>>({});
+    const [errors, setErrors] = useState<Partial<Omit<CustomerBE, "id">>>({});
     const validateForm = (): boolean => {
-        const newErrors: Partial<Omit<Customer, "id">> = {};
+        const newErrors: Partial<Omit<CustomerBE, "id">> = {};
 
-        if (!customerData.fullName.trim()) {
-            newErrors.fullName = 'Họ tên là bắt buộc';
+        if (!customerData.name.trim()) {
+            newErrors.name = 'Họ tên là bắt buộc';
         }
-        if (!customerData.emailAddress.trim()) {
-            newErrors.emailAddress = 'Email là bắt buộc';
-        } else if (!/\S+@\S+\.\S+/.test(customerData.emailAddress)) {
-            newErrors.emailAddress = 'Email không hợp lệ';
+        if (!customerData.email.trim()) {
+            newErrors.email = 'Email là bắt buộc';
+        } else if (!/\S+@\S+\.\S+/.test(customerData.email)) {
+            newErrors.email = 'Email không hợp lệ';
         }
         if (!customerData.company.trim()) {
             newErrors.company = 'Công ty là bắt buộc';
@@ -50,14 +50,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
         if (validateForm()) {
             console.log('Form is valid, calling onSubmit...');
             const dataToSubmit = {
-                fullName: customerData.fullName,
+                name: customerData.name,
                 company: customerData.company,
-                emailAddress: customerData.emailAddress,
-                phoneNumber: customerData.phoneNumber || '',
-                profilePictureUrl: customerData.profilePictureUrl || '',
-                location: customerData.location,
-                job: customerData.job,
-                status: customerData.status,
+                email: customerData.email,
+                phone: customerData.phone || '',
+                profilePicture: customerData.profilePicture || '',
+                // location: customerData.location,
+                // job: customerData.job,
+                // status: customerData.status,
                 notes: customerData.notes,
                 teamId: customerData.teamId,
                 createdBy: customerData.createdBy,
@@ -70,7 +70,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
             console.log('Form validation failed, errors:', errors);
         }
     };
-    const handleChange = (field: keyof Omit<Customer, 'id'>, value: string) => {
+    const handleChange = (field: keyof Omit<CustomerBE, 'id'>, value: string) => {
     setCustomerData(prev => ({
       ...prev,
       [field]: value
@@ -100,23 +100,23 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
               <input
                 id="fullName"
                 type="text"
-                value={customerData.fullName}
-                onChange={(e) => handleChange('fullName', e.target.value)}
-                className={errors.fullName ? 'error' : ''}
+                value={customerData.name}
+                onChange={(e) => handleChange('name', e.target.value)}
+                className={errors.name ? 'error' : ''}
               />
-              {errors.fullName && <span className="error-message">{errors.fullName}</span>}
+              {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
 
           <div className="form-group">
-            <label htmlFor="emailAddress">Email</label>
+            <label htmlFor="email">Email</label>
             <input
-              id="emailAddress"
+              id="email"
               type="email"
-              value={customerData.emailAddress}
-              onChange={(e) => handleChange('emailAddress', e.target.value)}
-              className={errors.emailAddress ? 'error' : ''}
+              value={customerData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              className={errors.email ? 'error' : ''}
             />
-            {errors.emailAddress && <span className="error-message">{errors.emailAddress}</span>}
+            {errors.email && <span className="error-message">{errors.email}</span>}
           </div>
 
           <div className="form-group">
@@ -134,20 +134,20 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
           <div className="form-group">
             <label htmlFor="phoneNumber">Phone Number</label>
             <input
-              id="phoneNumber"
+              id="phone"
               type="tel"
-              value={customerData.phoneNumber || ''}
-              onChange={(e) => handleChange('phoneNumber', e.target.value)}
+              value={customerData.phone || ''}
+              onChange={(e) => handleChange('phone', e.target.value)}
             />
           </div>
 
           <div className="form-group">
             <label htmlFor="profilePictureUrl">Profile Picture</label>
             <input
-              id="profilePictureUrl"
+              id="profilePicture"
               type="url"
-              value={customerData.profilePictureUrl || ''}
-              onChange={(e) => handleChange('profilePictureUrl', e.target.value)}
+              value={customerData.profilePicture || ''}
+              onChange={(e) => handleChange('profilePicture', e.target.value)}
               placeholder="https://example.com/avatar.jpg"
             />
           </div>

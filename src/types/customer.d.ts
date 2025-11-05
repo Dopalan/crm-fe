@@ -1,5 +1,42 @@
 // src/types/customer.d.ts
 
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+// CustomerBE = Customer
+export interface CustomerBE {
+  id: number; 
+  name: string; // BE dùng 'name'
+  email: string;
+  phone: string;
+  company: string;
+  notes: Note[];
+  profilePicture: string;
+  teamId: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SpringPage<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;       
+  number: number;      
+}
+export interface CustomerListQuery {
+  page: number;
+  pageSize: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
+  searchTerm?: string;
+}
+
+
 // "Bản thiết kế" cho một Ghi chú (Note)
 export interface Note {
   id: string;
@@ -62,8 +99,17 @@ export interface CustomerListQuery {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
+// cho update
+// export interface CustomerRequest {
+//   fullName: string;
+//   company: string;
+//   location: string;
+//   emailAddress: string;
+//   job: string; 
+//   phoneNumber?: string;
+// }
 
-// "Bản thiết kế" cho dữ liệu trả về từ API danh sách (đã có)
+//SpringPage<Customer> = CustomerListResponse
 export interface CustomerListResponse {
   content: Customer[];
   totalPages: number;
