@@ -1,13 +1,29 @@
-// Interface tạm thời
+// src/types/customer.d.ts
+
+// "Bản thiết kế" cho một Ghi chú (Note)
+export interface Note {
+  id: string;
+  content: string;
+  author: string;
+  createdAt: string;
+}
+
+// "Bản thiết kế" cho một Khách hàng (Customer) - Dùng cho cả List và Detail
 export interface Customer {
   id: string;
   fullName: string;
-  company: string;
-  location: string;
   emailAddress: string;
-  job: string; 
-  profilePictureUrl?: string; 
-  phoneNumber?: string;
+  phoneNumber: string;
+  company: string;
+  status: string;
+  profilePictureUrl: string | null;
+  notes: Note[];
+  teamId: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+  location: string;
+  job: string;
 }
 
 // API customer request 
@@ -37,7 +53,7 @@ export interface CustomerResponse {
   updatedAt: string;
 }
 
-// Định nghĩa cho tham số Truy vấn khi lấy danh sách
+// "Bản thiết kế" cho các tham số truy vấn danh sách
 export interface CustomerListQuery {
   page: number;
   pageSize: number;
@@ -47,11 +63,11 @@ export interface CustomerListQuery {
   sortOrder?: 'asc' | 'desc';
 }
 
-// Định nghĩa cho phản hồi (Response) từ API danh sách
+// "Bản thiết kế" cho dữ liệu trả về từ API danh sách (đã có)
 export interface CustomerListResponse {
   content: Customer[];
   totalPages: number;
   totalElements: number;
-  currentPage: number;
-  pageSize: number;
+  number: number;
+  size: number;
 }

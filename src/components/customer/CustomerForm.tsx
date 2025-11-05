@@ -17,6 +17,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
         job: '',
         phoneNumber: '',
         profilePictureUrl: '',
+        status: '',
+        notes: [],
+        teamId: 0,
+        createdBy: 0,
+        createdAt: '',
+        updatedAt: '',
     });
     const [errors, setErrors] = useState<Partial<Omit<Customer, "id">>>({});
     const validateForm = (): boolean => {
@@ -49,9 +55,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
                 emailAddress: customerData.emailAddress,
                 phoneNumber: customerData.phoneNumber || '',
                 profilePictureUrl: customerData.profilePictureUrl || '',
-                // field này không tồn tại trong backend
-                location: '',
-                job: ''
+                location: customerData.location,
+                job: customerData.job,
+                status: customerData.status,
+                notes: customerData.notes,
+                teamId: customerData.teamId,
+                createdBy: customerData.createdBy,
+                createdAt: customerData.createdAt,
+                updatedAt: customerData.updatedAt
             };
             console.log('Data to submit:', dataToSubmit);
             onSubmit(dataToSubmit);
