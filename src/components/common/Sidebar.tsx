@@ -1,37 +1,15 @@
 // src/components/common/Sidebar.tsx
-import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 import '../../styles/Sidebar.css';
 import { FaHome, FaStar, FaHashtag, FaSignOutAlt } from 'react-icons/fa';
-import { message } from 'antd';
-import { logoutApi } from '../../api/auth';
-import { useAuthStore } from '../../store/auth';
 
-const Sidebar: React.FC = () => {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const logout = useAuthStore((s) => s.logout);
+interface SidebarProps {
+  onLogout?: () => void; // 👈 Nhận hàm logout từ AppLayout
+  loading?: boolean;
+}
 
-  const handleLogout = async () => {
-    if (loading) return;
-    setLoading(true);
-    try {
-      
-      await logoutApi();
-
-      
-      logout?.();
-      message.success('Đăng xuất thành công!');
-      navigate('/login', { replace: true });
-    } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || 'Đăng xuất thất bại!';
-      message.error(errMsg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const Sidebar: React.FC<SidebarProps> = ({ onLogout, loading }) => {
   return (
     <div className="sidebar">
       <div className="sidebar-header">CRM</div>
@@ -51,11 +29,11 @@ const Sidebar: React.FC = () => {
         </NavLink>
       </nav>
 
-      
+      {/* 👇 Nút logout gọi hàm onLogout từ props */}
       <div className="logout-section">
         <button
           className="logout-btn"
-          onClick={handleLogout}
+          onClick={onLogout}
           disabled={loading}
           aria-busy={loading}
           title="Đăng xuất"
@@ -64,7 +42,6 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
 
-     
       <style>{`
         .logout-section {
           margin-top: auto;

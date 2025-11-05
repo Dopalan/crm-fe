@@ -1,11 +1,11 @@
-// src/hooks/useCustomerData.ts
-
 import { useState, useEffect, useCallback } from 'react';
-import { getCustomerList } from '../api/customer';
-import type { Customer, CustomerListQuery, CustomerListResponse } from '../types/customer.d';
+import { getCustomerList }//, searchCustomers } //  bỏ search 
+from '../api/customer';
+import type { Customer, CustomerListQuery, SpringPage } from '../types/customer.d';
+
 
 export const useCustomerData = (initialQuery: CustomerListQuery) => {
-  const [data, setData] = useState<Customer[]>([]);
+  const [data, setData] = useState<Customer[]>([]); // Respone -> Customer
   const [query, setQuery] = useState<CustomerListQuery>(initialQuery);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,29 +19,34 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      const response: CustomerListResponse = await getCustomerList(query);
+   try {
+
+      
+      const response = await getCustomerList(query);
+      
       setData(response.content);
       setPagination({
         totalPages: response.totalPages,
         totalElements: response.totalElements,
-        currentPage: response.currentPage,
-        pageSize: response.pageSize,
+        currentPage: response.number, 
+        pageSize: response.size,
       });
+
     } catch (err) {
       setError('Lỗi khi tải dữ liệu khách hàng. Vui lòng thử lại.');
       setData([]);
     } finally {
       setLoading(false);
     }
-  }, [query]); 
+  }, [query]);
 
   useEffect(() => {
     fetchCustomers();
   }, [fetchCustomers]);
 
+  //TODO: search, filter, sort chưa xong
   const setQueryParam = useCallback(<K extends keyof CustomerListQuery>(key: K, value: CustomerListQuery[K]) => {
-    if (key === 'searchTerm' || key === 'filterJob' || key === 'sortBy') {
+    if (key === 'searchTerm'  || key === 'sortBy') {
       setQuery(prev => ({
         ...prev,
         page: 0, 
@@ -56,12 +61,12 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
   }, []);
 
   return {
-    customers: data,
-    loading,
-    error,
-    pagination,
-    query,
-    setQueryParam,
-    refetch: fetchCustomers, 
-  };
+      customers: data,
+      loading,
+      error,
+      pagination,
+      query,
+      setQueryParam,
+      refetch: fetchCustomers, 
+    };
 };
