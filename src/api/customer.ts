@@ -3,89 +3,74 @@ import apiClient from './index';
 import type { 
   ApiResponse, 
   CustomerListQuery, 
-  CustomerListResponse, 
-  CustomerResponse,
-  CustomerRequest
+  SpringPage,
+  Customer,
+  //CustomerListResponse,  đã không dùng nữa?
+  //CustomerRequest đã không dùng nữa?
 } from '../types/customer.d';
 
-
-// api không có search và filter?
-// ✅ ĐÃ BỔ SUNG "Customer" vào import
-import type { Customer } from '../types/customer'; 
-
-// URL này đã đúng, giữ nguyên
 const CUSTOMER_URL = '/customers';
 
-// Hàm này đã có sẵn, giữ nguyên
 export const getCustomerList = async (
   query: CustomerListQuery,
-): Promise<CustomerListResponse> => {
+): Promise<SpringPage<Customer>> => {
   try {
-    const response = await apiClient.get<ApiResponse<CustomerListResponse>>(CUSTOMER_URL, {
+    const response = await apiClient.get<ApiResponse<SpringPage<Customer>>>(CUSTOMER_URL, {
       params: {
         page: query.page,
         size: query.pageSize,
-        sortBy: query.sortBy || 'createdAt', 
-        sortDir: query.sortDir || 'desc', 
+        sortBy: query.sortBy || 'createdAt',
+        sortDir: query.sortDir || 'desc',
       },
     });
-
-    return response.data.result; 
+    return response.data.data; 
   } catch (error) {
     console.error('Lỗi khi fetch danh sách khách hàng:', error);
     throw new Error('Không thể tải danh sách khách hàng.');
   }
 };
 
-///// Chưa phân trang?
-export const searchCustomers = async (
-  searchTerm: string
-): Promise<CustomerResponse[]> => { 
-  try {
-    const response = await apiClient.get<ApiResponse<CustomerResponse[]>>(`${CUSTOMER_URL}/search`, {
-      params: {
-        q: searchTerm, 
-      },
-    });
-    return response.data.result;
-  } catch (error) {
-    console.error('Lỗi khi tìm kiếm khách hàng:', error);
-    throw new Error('Không thể tìm kiếm khách hàng.');
-  }
-};
-
-// người khác phụ trách
-// export const getCustomerById = async (customerId: number): Promise<CustomerResponse> => {
+///// TODO: search chưa xong
+// export const searchCustomers = async (
+//   searchTerm: string
+// ): Promise<CustomerResponse[]> => { 
 //   try {
-//     const response = await apiClient.get<ApiResponse<CustomerResponse>>(`${CUSTOMER_URL}/${customerId}`);
-//     return response.data.result; // Trả về 'result'
+//     const response = await apiClient.get<ApiResponse<CustomerResponse[]>>(`${CUSTOMER_URL}/search`, {
+//       params: {
+//         q: searchTerm, 
+//       },
+//     });
+//     return response.data.result;
 //   } catch (error) {
-//     console.error(`Lỗi khi fetch chi tiết khách hàng ${customerId}:`, error);
-//     throw new Error('Không thể tải chi tiết khách hàng.');
+//     console.error('Lỗi khi tìm kiếm khách hàng:', error);
+//     throw new Error('Không thể tìm kiếm khách hàng.');
 //   }
 // };
 
-// mới nối
-export const updateCustomer = async (
-  customerId: number,
-  customerData: CustomerRequest 
-): Promise<CustomerResponse> => {
-  try {
-    const response = await apiClient.put<ApiResponse<CustomerResponse>>(
-      `${CUSTOMER_URL}/${customerId}`,
-      customerData
-    );
-    return response.data.result; 
-  } catch (error) {
-    console.error(`Lỗi khi cập nhật khách hàng ${customerId}:`, error);
-    throw new Error('Không thể cập nhật khách hàng.');
-  }
-};
+
+
+// TODO: update chưa xong
+// export const updateCustomer = async (
+//   customerId: number,
+//   customerData: CustomerRequest 
+// ): Promise<CustomerResponse> => {
+//   try {
+//     const response = await apiClient.put<ApiResponse<CustomerResponse>>(
+//       `${CUSTOMER_URL}/${customerId}`,
+//       customerData
+//     );
+//     return response.data.result; 
+//   } catch (error) {
+//     console.error(`Lỗi khi cập nhật khách hàng ${customerId}:`, error);
+//     throw new Error('Không thể cập nhật khách hàng.');
+//   }
+// };
 
 
 export const deleteCustomer = async (customerId: number): Promise<void> => {
   try {
-    await apiClient.delete<ApiResponse<void>>(`${CUSTOMER_URL}/${customerId}`);
+    await apiClient.delete<ApiResponse<string>>(`${CUSTOMER_URL}/${customerId}`);
+ 
   } catch (error) {
     console.error(`Lỗi khi xóa khách hàng ${customerId}:`, error);
     throw new Error('Không thể xóa khách hàng.');
@@ -100,10 +85,9 @@ export const deleteCustomer = async (customerId: number): Promise<void> => {
 
 
 
-//chưa có
+//TODO: chưa có
 export const getFilterOptions = async (): Promise<string[]> => {
   try {
-    /// api /customers/filter-options/jobs
     const response = await apiClient.get<string[]>('/customers/filter-options/jobs');
     return response.data;
   } catch (error) {
@@ -113,7 +97,6 @@ export const getFilterOptions = async (): Promise<string[]> => {
 };
 
 
-// ✅✅✅ BỔ SUNG HÀM NÀY VÀO ✅✅✅
 // Hàm lấy chi tiết một khách hàng bằng ID
 export const getCustomerById = async (customerId: string): Promise<Customer> => {
   try {

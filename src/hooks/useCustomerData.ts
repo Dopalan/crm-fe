@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getCustomerList, searchCustomers } from '../api/customer'; 
-import type { CustomerResponse, CustomerListQuery } from '../types/customer.d';
+import { getCustomerList }//, searchCustomers } //  bỏ search 
+from '../api/customer';
+import type { Customer, CustomerListQuery, SpringPage } from '../types/customer.d';
+
 
 export const useCustomerData = (initialQuery: CustomerListQuery) => {
-  const [data, setData] = useState<CustomerResponse[]>([]); 
+  const [data, setData] = useState<Customer[]>([]); // Respone -> Customer
   const [query, setQuery] = useState<CustomerListQuery>(initialQuery);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,34 +19,19 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
-    try {
-      if (query.searchTerm && query.searchTerm.trim() !== '') {
-        const searchResult = await searchCustomers(query.searchTerm);
-        setData(searchResult);
-        setPagination({
-          totalPages: 1,
-          totalElements: searchResult.length,
-          currentPage: 0,
-          pageSize: searchResult.length > 0 ? searchResult.length : initialQuery.pageSize,
-        });
+   try {
 
-      } else {
+      
+      const response = await getCustomerList(query);
+      
+      setData(response.content);
+      setPagination({
+        totalPages: response.totalPages,
+        totalElements: response.totalElements,
+        currentPage: response.number, 
+        pageSize: response.size,
+      });
 
-        const pageQuery: CustomerListQuery = {
-          page: query.page,
-          pageSize: query.pageSize,
-          sortBy: query.sortBy,
-          sortDir: query.sortDir,
-        };
-        const response = await getCustomerList(pageQuery);
-        setData(response.content);
-        setPagination({
-          totalPages: response.totalPages,
-          totalElements: response.totalElements,
-          currentPage: response.currentPage,
-          pageSize: response.pageSize,
-        });
-      }
     } catch (err) {
       setError('Lỗi khi tải dữ liệu khách hàng. Vui lòng thử lại.');
       setData([]);
@@ -57,8 +44,9 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
     fetchCustomers();
   }, [fetchCustomers]);
 
+  //TODO: search, filter, sort chưa xong
   const setQueryParam = useCallback(<K extends keyof CustomerListQuery>(key: K, value: CustomerListQuery[K]) => {
-    if (key === 'searchTerm' || key === 'filterJob' || key === 'sortBy') {
+    if (key === 'searchTerm'  || key === 'sortBy') {
       setQuery(prev => ({
         ...prev,
         page: 0, 
@@ -73,12 +61,12 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
   }, []);
 
   return {
-    customers: data,
-    loading,
-    error,
-    pagination,
-    query,
-    setQueryParam,
-    refetch: fetchCustomers, 
-  };
+      customers: data,
+      loading,
+      error,
+      pagination,
+      query,
+      setQueryParam,
+      refetch: fetchCustomers, 
+    };
 };
