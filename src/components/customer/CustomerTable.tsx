@@ -1,5 +1,6 @@
 // src/components/customer/CustomerTable.tsx
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 import type { Customer, CustomerListQuery } from '../../types/customer.d';
 import '../../styles/CustomerTable.css';
 interface CustomerTableProps {
@@ -17,6 +18,12 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
   onSort,
   sortConfig
 }) => {
+
+  const navigate = useNavigate();
+  const handleNavigateToDetail = (customerId: number) => {
+    navigate(`/customers/${customerId}`);
+  };
+
   const getSortIcon = (key: string) => {
     if (sortConfig.key !== key) {
       return null;
@@ -46,7 +53,10 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
         <tbody>
           {customers.map((customer) => (
             <tr key={customer.id}>
-              <td>
+              <td 
+                className="clickable-cell" 
+                onClick={() => handleNavigateToDetail(customer.id)}
+              >
                 <div className="user-profile-cell">
                   <img
                     src={customer.profilePicture || `https://i.pravatar.cc/30?u=${customer.id}`}

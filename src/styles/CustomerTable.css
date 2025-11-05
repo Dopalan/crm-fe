@@ -45,3 +45,19 @@ td:last-child, th:last-child {
 }
 .action-btn.edit { color: #007bff; }
 .action-btn.delete { color: #dc3545; }
+
+
+
+/* // khi di chuột vào ô có class clickable-cell */
+.clickable-cell {
+  cursor: pointer; 
+}
+
+.clickable-cell .user-profile-cell span {
+  transition: color 0.2s;
+  color: #333; 
+}
+
+.clickable-cell:hover .user-profile-cell span {
+  color: #007BFF;
+}
