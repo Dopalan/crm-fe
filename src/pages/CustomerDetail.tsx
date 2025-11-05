@@ -1,194 +1,198 @@
 // src/pages/CustomerDetail.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Layout, Menu, Button, Avatar, Typography, Row, Col, Card, Tabs, List, Spin, Alert, Empty, Form, Input
+  Layout, Menu, Button, Avatar, Typography, Row, Col, Card, Tabs, List, Spin, Alert, Empty, Form, Input, message
 } from 'antd';
 import {
-  HomeOutlined, UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, PlusOutlined,
-  InfoCircleOutlined, MessageOutlined, HistoryOutlined, ScheduleOutlined
+  ArrowLeftOutlined, // ✅ ĐÃ IMPORT THÊM ICON MŨI TÊN
+  UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, PlusOutlined,
+  InfoCircleOutlined, MessageOutlined, HistoryOutlined, ScheduleOutlined,
+  ApartmentOutlined
 } from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { getCustomerById } from '../api/customer';
-import type { Customer, Note } from '../types';
+import { getCustomerById, updateCustomerById } from '../api/customer';
+import type { Customer, Note, CustomerUpdateRequest } from '../types';
 
-const { Sider, Content, Header } = Layout;
+const { Header, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 export default function CustomerDetail() {
   const { customerId } = useParams<{ customerId: string }>();
   const navigate = useNavigate();
-  
-  // State để quản lý chế độ chỉnh sửa (edit mode)
   const [isEditing, setIsEditing] = useState(false);
   const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
-  const { data: customer, isLoading, error, refetch } = useQuery<Customer>({
+  const { data: customer, isLoading, error } = useQuery<Customer>({
     queryKey: ['customer', customerId],
     queryFn: () => getCustomerById(customerId!),
     enabled: !!customerId,
   });
 
-  // Hàm xử lý khi nhấn nút Edit
-  const handleEdit = () => {
-    // Đổ dữ liệu hiện tại của khách hàng vào form
-    form.setFieldsValue({
-      name: customer?.name,
-      company: customer?.company,
-      email: customer?.email,
-      phone: customer?.phone
-    });
-    setIsEditing(true);
-  };
+  const updateMutation = useMutation({
+    mutationFn: updateCustomerById,
+    onSuccess: () => {
+      message.success('Cập nhật khách hàng thành công!');
+      queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
+      setIsEditing(false);
+    },
+    onError: (err: Error) => {
+      message.error(err.message);
+    }
+  });
 
-  // Hàm xử lý khi nhấn nút Cancel
-  const handleCancel = () => {
-    setIsEditing(false);
-  };
+  useEffect(() => {
+    if (isEditing && customer) {
+      form.setFieldsValue({
+        name: customer.name,
+        company: customer.company,
+        email: customer.email,
+        phone: customer.phone,
+        profilePicture: customer.profilePicture,
+      });
+    }
+  }, [isEditing, customer, form]);
+
+  const handleEdit = () => setIsEditing(true);
+  const handleCancel = () => setIsEditing(false);
   
-  // Hàm xử lý khi submit form (nhấn Save)
-  const handleSave = (values: any) => {
-    console.log('Dữ liệu mới đã lưu:', values);
-    // Tương lai: ở đây bạn sẽ gọi API để cập nhật backend
-    // ví dụ: mutation.mutate({ customerId, ...values });
-    setIsEditing(false); // Quay lại chế độ xem
+  const handleSave = (values: CustomerUpdateRequest) => {
+    if (!customerId) return;
+    updateMutation.mutate({ customerId, data: values });
   };
-
 
   if (isLoading) {
-    return <Layout style={{ minHeight: '100vh', justifyContent: 'center', alignItems: 'center' }}><Spin size="large" /></Layout>;
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Spin size="large" /></div>;
   }
 
   if (error) {
     return (
-        <div style={{ padding: 50 }}>
-            <Alert
-                message="Error"
-                description={(error as Error).message}
-                type="error"
-                showIcon
-                action={<Link to="/"><Button size="small" type="primary">Back to Home</Button></Link>}
-            />
-        </div>
+      <div style={{ padding: 50 }}>
+        <Alert
+          message="Error"
+          description={(error as Error).message}
+          type="error"
+          showIcon
+          action={<Link to="/customers"><Button size="small" type="primary">Back to List</Button></Link>}
+        />
+      </div>
     );
   }
 
   if (!customer) {
-    return <Layout style={{ minHeight: '100vh', justifyContent: 'center', alignItems: 'center' }}><Spin tip="Preparing data..." size="large" /></Layout>;
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><Spin tip="Preparing data..." size="large" /></div>;
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      {/* ... (Phần Sider và Header giữ nguyên) ... */}
-      <Content style={{ margin: '24px 16px 0' }}>
+    <>
+      {/* ✅ HEADER MỚI: THÊM NÚT BACK ICON VÀ CĂN CHỈNH */}
+      <Header style={{ 
+          padding: '0 24px', 
+          background: '#fff', 
+          borderBottom: '1px solid #f0f0f0',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px' // Tạo khoảng cách giữa nút và tiêu đề
+      }}>
+        <Button 
+          type="text" // Nút không có nền, trông gọn gàng hơn
+          shape="circle"
+          icon={<ArrowLeftOutlined />} 
+          onClick={() => navigate('/customers')} // Quay về trang danh sách
+        />
+        <Title level={4} style={{ margin: 0 }}>Customer Details</Title>
+      </Header>
+      
+      <Content style={{ padding: '24px' }}>
         <Row gutter={[24, 24]}>
+          {/* CỘT THÔNG TIN VÀ CHỨC NĂNG EDIT */}
           <Col xs={24} md={8}>
-            <Card bordered={false}>
-              {/* Chế độ xem thông tin */}
+            <Card bordered={false} style={{ position: 'relative' }}>
               {!isEditing && (
                 <>
-                  <Button 
-                    icon={<EditOutlined />} 
-                    style={{ position: 'absolute', top: 16, right: 16 }}
-                    onClick={handleEdit}
-                  >
-                    Edit
-                  </Button>
-                  <div style={{ textAlign: 'center', paddingTop: 24 }}>
+                  <Button icon={<EditOutlined />} onClick={handleEdit} style={{ position: 'absolute', top: 16, right: 16 }}>Edit</Button>
+                  <div style={{ textAlign: 'center', paddingTop: '24px' }}>
                     <Avatar size={96} src={customer.profilePicture || undefined} icon={<UserOutlined />} />
                     <Title level={4} style={{ marginTop: 16, marginBottom: 0 }}>{customer.name}</Title>
-                    <Text type="secondary">{customer.company}</Text>
                   </div>
                   <div style={{ marginTop: 24 }}>
                     <Paragraph><MailOutlined style={{ marginRight: 8 }} /> {customer.email}</Paragraph>
                     <Paragraph><PhoneOutlined style={{ marginRight: 8 }} /> {customer.phone}</Paragraph>
-                    <Paragraph><InfoCircleOutlined style={{ marginRight: 8 }} /> Status: <Text strong>{customer.status}</Text></Paragraph>
+                    <Paragraph><ApartmentOutlined style={{ marginRight: 8 }} /> Company: <Text strong>{customer.company}</Text></Paragraph>
                   </div>
                 </>
               )}
-
-              {/* Chế độ chỉnh sửa (inline editing) */}
               {isEditing && (
-                <Form
-                  form={form}
-                  layout="vertical"
-                  onFinish={handleSave}
-                  initialValues={customer}
-                >
+                <Form form={form} layout="vertical" onFinish={handleSave}>
                   <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                      <Avatar size={96} src={customer.profilePicture || undefined} icon={<UserOutlined />} />
+                    <Avatar size={96} src={customer.profilePicture || undefined} icon={<UserOutlined />} />
                   </div>
-                  <Form.Item name="name" label="Name" rules={[{ required: true, message: 'Please input the name!' }]}>
+                  <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                     <Input />
                   </Form.Item>
-                   <Form.Item name="company" label="Company" rules={[{ required: true, message: 'Please input the company!' }]}>
+                  <Form.Item name="company" label="Company" rules={[{ required: true }]}>
                     <Input />
                   </Form.Item>
-                  <Form.Item 
-                    name="email" 
-                    label="Email" 
-                    rules={[
-                      { required: true, message: 'Please input the email!' },
-                      { type: 'email', message: 'The input is not valid E-mail!' }
-                    ]}
-                  >
+                  <Form.Item name="email" label="Email" rules={[{ required: true, type: 'email' }]}>
                     <Input />
                   </Form.Item>
-                  <Form.Item name="phone" label="Phone" rules={[{ required: true, message: 'Please input the phone number!' }]}>
+                  <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
                     <Input />
+                  </Form.Item>
+                  <Form.Item name="profilePicture" label="Profile Picture URL">
+                    <Input placeholder="https://example.com/image.png" />
                   </Form.Item>
                   <Form.Item style={{ textAlign: 'right', marginTop: 24, marginBottom: 0 }}>
-                    <Button onClick={handleCancel} style={{ marginRight: 8 }}>
-                      Cancel
-                    </Button>
-                    <Button type="primary" htmlType="submit">
-                      Save
-                    </Button>
+                    <Button onClick={handleCancel} style={{ marginRight: 8 }}>Cancel</Button>
+                    <Button type="primary" htmlType="submit" loading={updateMutation.isPending}>Save</Button>
                   </Form.Item>
                 </Form>
               )}
             </Card>
           </Col>
+          
+          {/* CỘT CHỨA CÁC TAB */}
           <Col xs={24} md={16}>
-            <Card bordered={false}>
-              <Tabs defaultActiveKey="notes">
-                <TabPane tab={<span><MessageOutlined /> Notes</span>} key="notes">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                      <Title level={5} style={{ margin: 0 }}>Notes</Title>
-                      <Button icon={<PlusOutlined />} onClick={() => console.log('Add Note clicked')}>Add Note</Button>
-                  </div>
-                  <List
-                    dataSource={customer.notes}
-                    renderItem={(item: Note) => (
-                      <List.Item>
-                        <List.Item.Meta
-                            title={item.author}
-                            description={`${item.content} - ${new Date(item.createdAt).toLocaleDateString()}`}
-                        />
-                      </List.Item>
-                    )}
-                    locale={{ emptyText: <Empty description="No notes available." /> }}
-                  />
-                </TabPane>
-                
-                <TabPane tab={<span><HistoryOutlined /> Interaction History</span>} key="interaction">
-                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                      <Title level={5} style={{ margin: 0 }}>Interaction History</Title>
-                      <Button icon={<PlusOutlined />} onClick={() => console.log('Add Interaction clicked')}>Add Interaction</Button>
-                  </div>
-                  <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No interaction history available." />
-                </TabPane>
+              <Card bordered={false}>
+                <Tabs defaultActiveKey="notes">
+                  <TabPane tab={<span><MessageOutlined /> Notes</span>} key="notes">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                        <Title level={5} style={{ margin: 0 }}>Notes</Title>
+                        <Button icon={<PlusOutlined />}>Add Note</Button>
+                    </div>
+                    <List
+                      dataSource={customer.notes || []}
+                      renderItem={(item: Note) => (
+                        <List.Item>
+                            <List.Item.Meta
+                                title={item.author}
+                                description={`${item.content} - ${new Date(item.createdAt).toLocaleDateString()}`}
+                            />
+                        </List.Item>
+                      )}
+                      locale={{ emptyText: <Empty description="No notes available." /> }}
+                    />
+                  </TabPane>
+                  
+                  <TabPane tab={<span><HistoryOutlined /> Interaction History</span>} key="interaction">
+                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+                        <Title level={5} style={{ margin: 0 }}>Interaction History</Title>
+                        <Button icon={<PlusOutlined />}>Add Interaction</Button>
+                    </div>
+                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No interaction history available." />
+                  </TabPane>
 
-                <TabPane tab={<span><ScheduleOutlined /> Schedule</span>} key="schedule">
-                   <Title level={5} style={{ margin: 0, marginBottom: 24 }}>Schedule</Title>
-                   <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No schedule available." />
-                </TabPane>
-              </Tabs>
-            </Card>
-          </Col>
+                  <TabPane tab={<span><ScheduleOutlined /> Schedule</span>} key="schedule">
+                     <Title level={5} style={{ margin: 0, marginBottom: 24 }}>Schedule</Title>
+                     <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No schedule available." />
+                  </TabPane>
+                </Tabs>
+              </Card>
+            </Col>
         </Row>
       </Content>
-    </Layout>
+    </>
   );
 }

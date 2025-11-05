@@ -1,4 +1,44 @@
 // src/types/customer.d.ts
+<<<<<<< Updated upstream
+=======
+import type { Interaction } from './interaction';
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
+// CustomerBE = Customer
+export interface CustomerBE {
+  id: number; 
+  name: string; // BE dùng 'name'
+  email: string;
+  phone: string;
+  company: string;
+  notes: Note[];
+  profilePicture: string;
+  teamId: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SpringPage<T> {
+  content: T[];
+  totalPages: number;
+  totalElements: number;
+  size: number;       
+  number: number;      
+}
+export interface CustomerListQuery {
+  page: number;
+  pageSize: number;
+  sortBy?: string;
+  sortDir?: 'asc' | 'desc';
+  searchTerm?: string;
+}
+
+>>>>>>> Stashed changes
 
 // "Bản thiết kế" cho một Ghi chú (Note)
 export interface Note {
@@ -24,7 +64,47 @@ export interface Customer {
   updatedAt: string;
 }
 
+<<<<<<< Updated upstream
 // "Bản thiết kế" cho các tham số truy vấn danh sách (đã có)
+=======
+// API customer request 
+export interface CustomerRequest {
+  name: string;
+  email?: string;
+  phone?: string;
+  company: string;
+  notes?: string;
+  profilePicture?: string;
+  teamId?: number;
+  createdBy?: number;
+}
+
+// API customer response
+export interface CustomerResponse {
+  id: number;
+  name: string;
+  email?: string;
+  phone?: string;
+  company: string;
+  notes?: string;
+  profilePicture?: string;
+  teamId: number;
+  createdBy: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+//Edit Customer Information
+export interface CustomerUpdateRequest {
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  profilePicture?: string | null;
+}
+
+// "Bản thiết kế" cho các tham số truy vấn danh sách
+>>>>>>> Stashed changes
 export interface CustomerListQuery {
   page: number;
   pageSize: number;
