@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getCustomerList }//, searchCustomers } //  bỏ search 
 from '../api/customer';
-import type { Customer, CustomerListQuery, SpringPage } from '../types/customer.d';
+import type { CustomerBE, CustomerListQuery } from '../types/customer.d';
 
 
 export const useCustomerData = (initialQuery: CustomerListQuery) => {
-  const [data, setData] = useState<Customer[]>([]); // Respone -> Customer
+  const [data, setData] = useState<CustomerBE[]>([]); // Respone -> CustomerBE
   const [query, setQuery] = useState<CustomerListQuery>(initialQuery);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

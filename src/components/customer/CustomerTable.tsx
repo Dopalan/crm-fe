@@ -1,10 +1,10 @@
 // src/components/customer/CustomerTable.tsx
 import React from 'react';
 import { useNavigate } from "react-router-dom";
-import type { Customer, CustomerListQuery } from '../../types/customer.d';
+import type { CustomerBE, CustomerListQuery } from '../../types/customer.d';
 import '../../styles/CustomerTable.css';
 interface CustomerTableProps {
-  customers: Customer[];
+  customers: CustomerBE[];
   onEdit: (id: number) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
   onSort: (key: string) => void;

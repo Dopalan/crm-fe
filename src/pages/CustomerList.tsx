@@ -1,17 +1,21 @@
 // src/pages/CustomerList.tsx
 import React, { useState, useEffect } from 'react';
 import { useCustomerData } from '../hooks/useCustomerData';
-import type { CustomerListQuery } from '../types/customer.d';
+import { createCustomer } from '../api/customer';
+import type { CustomerBE, CustomerListQuery } from '../types/customer.d';
 import { deleteCustomer } from '../api/customer';
 import CustomerTable from '../components/customer/CustomerTable';
+import CustomerForm from '../components/customer/CustomerForm';
 import Pagination from '../components/common/Pagination';
 import '../styles/CustomerList.css'; 
+import type { Customer } from '../types/customer';
 
 const INITIAL_PAGE_SIZE = 10;
 
 const CustomerList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  // const [filterJob, setFilterJob] = useState('All');
+  const [filterJob, setFilterJob] = useState('All');
+  const [showAddForm, setShowAddForm] = useState(false);
   // const [jobOptions, setJobOptions] = useState<string[]>([]);
 
   const {
@@ -105,6 +109,30 @@ const handleSort = (key: string) => {
   //   fetchJobOptions();
   // }, []);
 
+  const handleAdd = () => {
+    setShowAddForm(true);
+  };
+
+  const handleFormSubmit = async (customerData: Omit<CustomerBE, 'id'>) => {
+    try {
+      const newCustomer = await createCustomer(customerData);
+      console.log('Customer created successfully:', newCustomer);
+      
+      setShowAddForm(false);
+      setQueryParam('page', 0);
+
+      alert('Customer added successfully!');
+      
+    } catch (error: any) {
+      console.error('Error creating customer:', error);
+      alert(`An error occurred while adding the customer: ${error.message}`);
+    }
+  };
+
+  const handleFormCancel = () => {
+    setShowAddForm(false);
+  };
+
   return (
     <div className="customer-list-container">
       <div className="toolbar">
@@ -123,13 +151,18 @@ const handleSort = (key: string) => {
           onChange={handleFilterChange}
         >
           <option value="All">Job: All</option>
+          <option value="A">Job: A</option>
+          <option value="B">Job: B</option>
+          <option value="C">Job: C</option>
+        </select>
+        <button className="add-button" onClick={handleAdd}>
           {jobOptions.map((job) => (
             <option key={job} value={job}>
               Job: {job}
             </option>
           ))}
         </select> */}
-        <button className="add-button">
+        <button className="add-button" onClick={handleAdd}>
           Add
         </button>
       </div>
@@ -156,6 +189,13 @@ const handleSort = (key: string) => {
           currentPage={pagination.currentPage}
           totalPages={pagination.totalPages}
           onPageChange={handlePageChange}
+        />
+      )}
+
+      {showAddForm && (
+        <CustomerForm
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
         />
       )}
     </div>

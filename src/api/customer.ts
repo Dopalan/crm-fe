@@ -4,18 +4,23 @@ import type {
   ApiResponse, 
   CustomerListQuery, 
   SpringPage,
+  CustomerBE,
+  CustomerResponse,
   Customer,
+  CustomerRequest,
   //CustomerListResponse,  đã không dùng nữa?
   //CustomerRequest đã không dùng nữa?
 } from '../types/customer.d';
+
+import { useAuthStore } from '../store/auth';
 
 const CUSTOMER_URL = '/customers';
 
 export const getCustomerList = async (
   query: CustomerListQuery,
-): Promise<SpringPage<Customer>> => {
+): Promise<SpringPage<CustomerBE>> => {
   try {
-    const response = await apiClient.get<ApiResponse<SpringPage<Customer>>>(CUSTOMER_URL, {
+    const response = await apiClient.get<ApiResponse<SpringPage<CustomerBE>>>(CUSTOMER_URL, {
       params: {
         page: query.page,
         size: query.pageSize,
@@ -30,42 +35,50 @@ export const getCustomerList = async (
   }
 };
 
-///// TODO: search chưa xong
-// export const searchCustomers = async (
-//   searchTerm: string
-// ): Promise<CustomerResponse[]> => { 
-//   try {
-//     const response = await apiClient.get<ApiResponse<CustomerResponse[]>>(`${CUSTOMER_URL}/search`, {
-//       params: {
-//         q: searchTerm, 
-//       },
-//     });
-//     return response.data.result;
-//   } catch (error) {
-//     console.error('Lỗi khi tìm kiếm khách hàng:', error);
-//     throw new Error('Không thể tìm kiếm khách hàng.');
-//   }
-// };
+export const createCustomer = async (
+  customerData: Omit<CustomerBE, 'id'>
+): Promise<CustomerResponse> => {
+  try {
+    const token = useAuthStore.getState().token;
+    
+    if (!token) {
+      throw new Error('Vui lòng đăng nhập lại.');
+    }
 
+    const requestData: CustomerRequest = {
+      name: customerData.name,
+      email: customerData.email || undefined,
+      phone: customerData.phone || undefined,
+      company: customerData.company,
+      notes: undefined,
+      profilePicture: customerData.profilePicture || undefined,
+      teamId: 1, // Default team ID
+      createdBy: 1, // Default created by - có thể lấy từ auth store
+    };
 
+    console.log('Sending request data:', requestData);
 
-// TODO: update chưa xong
-// export const updateCustomer = async (
-//   customerId: number,
-//   customerData: CustomerRequest 
-// ): Promise<CustomerResponse> => {
-//   try {
-//     const response = await apiClient.put<ApiResponse<CustomerResponse>>(
-//       `${CUSTOMER_URL}/${customerId}`,
-//       customerData
-//     );
-//     return response.data.result; 
-//   } catch (error) {
-//     console.error(`Lỗi khi cập nhật khách hàng ${customerId}:`, error);
-//     throw new Error('Không thể cập nhật khách hàng.');
-//   }
-// };
+    const response = await apiClient.post<CustomerResponse>(CUSTOMER_URL, requestData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
+    return response.data;
+  } catch (error: any) {
+
+    console.error('Error response:', error.response);
+
+    if (error.response?.status === 401) {
+      throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    } else if (error.response?.status === 400) {
+      throw new Error('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại thông tin.');
+    } else {
+      throw new Error(error.message || 'Không thể tạo khách hàng mới.');
+    }
+  }
+};
 
 export const deleteCustomer = async (customerId: number): Promise<void> => {
   try {
@@ -77,14 +90,6 @@ export const deleteCustomer = async (customerId: number): Promise<void> => {
   }
 };
 
-
-
-
-
-
-
-
-
 //TODO: chưa có
 export const getFilterOptions = async (): Promise<string[]> => {
   try {
@@ -95,7 +100,6 @@ export const getFilterOptions = async (): Promise<string[]> => {
     return [];
   }
 };
-
 
 // Hàm lấy chi tiết một khách hàng bằng ID
 export const getCustomerById = async (customerId: string): Promise<Customer> => {
