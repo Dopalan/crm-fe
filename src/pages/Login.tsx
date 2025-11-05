@@ -37,7 +37,11 @@ const Login: React.FC = () => {
 
       message.success("Đăng nhập thành công");
       
+<<<<<<< HEAD
       navigate("/customers");
+=======
+      navigate("/");
+>>>>>>> cef32b53988515915c7ec13176698bb1d627ff55
     } catch (err: any) {
       const errMsg = err?.message || "Tên đăng nhập hoặc mật khẩu không đúng";
       message.error(errMsg);
