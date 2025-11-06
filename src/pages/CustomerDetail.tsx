@@ -116,7 +116,7 @@ export default function CustomerDetail() {
   }
 
   return (
-    <>
+    <Layout>
       {/* ✅ HEADER MỚI: THÊM NÚT BACK ICON VÀ CĂN CHỈNH */}
       <Header style={{ 
           padding: '0 24px', 
