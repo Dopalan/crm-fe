@@ -44,16 +44,16 @@ export default function CustomerDetail() {
   });
 
   useEffect(() => {
-    if (isEditing && customer) {
-      form.setFieldsValue({
-        name: customer.name,
-        company: customer.company,
-        email: customer.email,
-        phone: customer.phone,
-        profilePicture: customer.profilePicture,
-      });
-    }
-  }, [isEditing, customer, form]);
+  if (isEditing && customer) {
+    form.setFieldsValue({
+      name: (customer as any).fullName ?? (customer as any).name ?? '',
+      company: (customer as any).company ?? '',
+      email: (customer as any).emailAddress ?? (customer as any).email ?? '',
+      phone: (customer as any).phoneNumber ?? (customer as any).phone ?? '',
+      profilePicture: (customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? '',
+    });
+  }
+}, [isEditing, customer, form]);
 
   const handleEdit = () => setIsEditing(true);
   const handleCancel = () => setIsEditing(false);
@@ -114,20 +114,31 @@ export default function CustomerDetail() {
                 <>
                   <Button icon={<EditOutlined />} onClick={handleEdit} style={{ position: 'absolute', top: 16, right: 16 }}>Edit</Button>
                   <div style={{ textAlign: 'center', paddingTop: '24px' }}>
-                    <Avatar size={96} src={customer.profilePicture || undefined} icon={<UserOutlined />} />
-                    <Title level={4} style={{ marginTop: 16, marginBottom: 0 }}>{customer.name}</Title>
+                    <Avatar
+                      size={96}
+                      src={(customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? undefined}
+                      icon={<UserOutlined />}
+                    />
+                    <Title level={4} style={{ marginTop: 16, marginBottom: 0 }}>
+                      {(customer as any).fullName ?? (customer as any).name ?? 'Unknown'}
+                    </Title>
                   </div>
                   <div style={{ marginTop: 24 }}>
-                    <Paragraph><MailOutlined style={{ marginRight: 8 }} /> {customer.email}</Paragraph>
-                    <Paragraph><PhoneOutlined style={{ marginRight: 8 }} /> {customer.phone}</Paragraph>
-                    <Paragraph><ApartmentOutlined style={{ marginRight: 8 }} /> Company: <Text strong>{customer.company}</Text></Paragraph>
+                    <Paragraph><MailOutlined style={{ marginRight: 8 }} /> {(customer as any).emailAddress ?? (customer as any).email ?? '-'}</Paragraph>
+
+                    <Paragraph><PhoneOutlined style={{ marginRight: 8 }} /> {(customer as any).phoneNumber ?? (customer as any).phone ?? '-'}</Paragraph>
+                    <Paragraph><ApartmentOutlined style={{ marginRight: 8 }} /> Company: <Text strong>{(customer as any).company ?? '-'}</Text></Paragraph>
                   </div>
                 </>
               )}
               {isEditing && (
                 <Form form={form} layout="vertical" onFinish={handleSave}>
                   <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                    <Avatar size={96} src={customer.profilePicture || undefined} icon={<UserOutlined />} />
+                    <Avatar
+                      size={96}
+                      src={(customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? undefined}
+                      icon={<UserOutlined />}
+                    />
                   </div>
                   <Form.Item name="name" label="Name" rules={[{ required: true }]}>
                     <Input />
@@ -163,7 +174,7 @@ export default function CustomerDetail() {
                         <Button icon={<PlusOutlined />}>Add Note</Button>
                     </div>
                     <List
-                      dataSource={customer.notes || []}
+                      dataSource={(customer as any).notes ?? (customer as any).noteList ?? []}
                       renderItem={(item: Note) => (
                         <List.Item>
                             <List.Item.Meta
