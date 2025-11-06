@@ -9,8 +9,9 @@ import {
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { getCustomerById } from '../api/customer';
-import type { Customer, Note } from '../types';
+import { getCustomerById, addCustomerNote } from '../api/customer';
+import type { Customer, CustomerBE, Note } from '../types';
+import CustomerNoteForm from '../components/customer/CustomerNoteForm';
 
 const { Sider, Content, Header } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -22,9 +23,10 @@ export default function CustomerDetail() {
   
   // State để quản lý chế độ chỉnh sửa (edit mode)
   const [isEditing, setIsEditing] = useState(false);
+  const [showNoteForm, setShowNoteForm] = useState(false);
   const [form] = Form.useForm();
 
-  const { data: customer, isLoading, error, refetch } = useQuery<Customer>({
+  const { data: customer, isLoading, error, refetch } = useQuery<CustomerBE>({
     queryKey: ['customer', customerId],
     queryFn: () => getCustomerById(customerId!),
     enabled: !!customerId,
@@ -53,6 +55,33 @@ export default function CustomerDetail() {
     // Tương lai: ở đây bạn sẽ gọi API để cập nhật backend
     // ví dụ: mutation.mutate({ customerId, ...values });
     setIsEditing(false); // Quay lại chế độ xem
+  };
+
+  const handleAddNote = () => {
+    setShowNoteForm(true);
+  };
+
+  const handleSubmitNotes = async (notes: Omit<Note, "id" | "createdAt">[]) => {
+    try {
+      // API chỉ nhận 1 note mỗi lần, nên gọi API nhiều lần
+      for (const note of notes) {
+        await addCustomerNote(Number(customerId), note.content);
+      }
+      
+      console.log('Đã lưu ghi chú');
+      refetch();
+      
+      setShowNoteForm(false);
+
+      alert(`Đã thêm ${notes.length} ghi chú thành công!`);
+    } catch (error: any) {
+      console.error('Lỗi khi lưu notes:', error);
+      alert('Có lỗi xảy ra khi lưu ghi chú: ' + error.message);
+    }
+  };
+
+  const handleCancelNoteForm = () => {
+    setShowNoteForm(false);
   };
 
 
@@ -103,7 +132,7 @@ export default function CustomerDetail() {
                   <div style={{ marginTop: 24 }}>
                     <Paragraph><MailOutlined style={{ marginRight: 8 }} /> {customer.email}</Paragraph>
                     <Paragraph><PhoneOutlined style={{ marginRight: 8 }} /> {customer.phone}</Paragraph>
-                    <Paragraph><InfoCircleOutlined style={{ marginRight: 8 }} /> Status: <Text strong>{customer.status}</Text></Paragraph>
+                    {/* <Paragraph><InfoCircleOutlined style={{ marginRight: 8 }} /> Status: <Text strong>{customer.status}</Text></Paragraph> */}
                   </div>
                 </>
               )}
@@ -156,7 +185,7 @@ export default function CustomerDetail() {
                 <TabPane tab={<span><MessageOutlined /> Notes</span>} key="notes">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                       <Title level={5} style={{ margin: 0 }}>Notes</Title>
-                      <Button icon={<PlusOutlined />} onClick={() => console.log('Add Note clicked')}>Add Note</Button>
+                      <Button icon={<PlusOutlined />} onClick={handleAddNote}>Add Note</Button>
                   </div>
                   <List
                     dataSource={customer?.notes || []}
@@ -189,6 +218,16 @@ export default function CustomerDetail() {
           </Col>
         </Row>
       </Content>
+
+      {/* Customer Note Form Modal */}
+      {showNoteForm && customer && (
+        <CustomerNoteForm
+          customerId={Number(customerId)}
+          customerName={customer.name}
+          onSubmit={handleSubmitNotes}
+          onCancel={handleCancelNoteForm}
+        />
+      )}
     </Layout>
   );
 }

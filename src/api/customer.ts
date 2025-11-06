@@ -102,10 +102,10 @@ export const getFilterOptions = async (): Promise<string[]> => {
 };
 
 // Hàm lấy chi tiết một khách hàng bằng ID
-export const getCustomerById = async (customerId: string): Promise<Customer> => {
+export const getCustomerById = async (customerId: string): Promise<CustomerBE> => {
   try {
-    const response = await apiClient.get<Customer>(`${CUSTOMER_URL}/${customerId}`);
-    
+    const response = await apiClient.get<CustomerBE>(`${CUSTOMER_URL}/${customerId}`);
+
     // Giả sử backend trả về cấu trúc ApiResponse, dữ liệu thật nằm trong ".data"
     // Cần ép kiểu 'any' vì axios response không biết cấu trúc ApiResponse của bạn
     const apiResponse = response.data as any;
@@ -119,5 +119,20 @@ export const getCustomerById = async (customerId: string): Promise<Customer> => 
   } catch (error) {
     console.error(`Lỗi khi fetch chi tiết khách hàng ${customerId}:`, error);
     throw new Error('Không thể tải chi tiết khách hàng.');
+  }
+};
+
+export const addCustomerNote = async (
+  customerId: number,
+  content: string
+): Promise<void> => {
+  try {
+    await apiClient.post<ApiResponse<any>>(
+      `${CUSTOMER_URL}/${customerId}/notes`,
+      { content }
+    );
+  } catch (error) {
+    console.error(`Lỗi khi thêm note cho khách hàng ${customerId}:`, error);
+    throw new Error('Không thể thêm ghi chú.');
   }
 };
