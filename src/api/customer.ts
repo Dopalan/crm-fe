@@ -29,6 +29,7 @@ export const getCustomerList = async (
         size: query.pageSize,
         sortBy: query.sortBy || 'createdAt',
         sortDir: query.sortDir || 'desc',
+        keyword: query.searchTerm, 
       },
     });
     return response.data.data; 
