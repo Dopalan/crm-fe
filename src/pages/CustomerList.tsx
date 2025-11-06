@@ -8,15 +8,22 @@ import CustomerTable from '../components/customer/CustomerTable';
 import CustomerForm from '../components/customer/CustomerForm';
 import Pagination from '../components/common/Pagination';
 import '../styles/CustomerList.css'; 
+import { Select} from 'antd';
 import type { Customer } from '../types/customer';
 
 const INITIAL_PAGE_SIZE = 10;
-
+const VIETNAM_LOCATIONS = [
+  "Hà Nội", "Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ", 
+  "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Kạn", "Bạc Liêu",
+  "Bắc Ninh", "Bến Tre", "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận",
+  "Cà Mau", "Cao Bằng", "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai",
+  "Đồng Tháp", "Gia Lai", "Hà Giang", "Hà Nam", "Hà Tĩnh", "Hải Dương",
+  "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa", "Kiên Giang", "Kon Tum"
+];
 const CustomerList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterJob, setFilterJob] = useState('All');
+  const [filterLocation, setFilterLocation] = useState<string | undefined>(undefined);
   const [showAddForm, setShowAddForm] = useState(false);
-  // const [jobOptions, setJobOptions] = useState<string[]>([]);
 
   const {
     customers,
@@ -44,13 +51,14 @@ const CustomerList: React.FC = () => {
       setQueryParam('searchTerm', searchTerm);
     }
   };
+  // filter không có searchTerm
+  const handleFilterLocationChange = (newLocation: string | undefined) => {
+    const actualLocation = newLocation === "ALL" ? undefined : newLocation;
+    setFilterLocation(actualLocation);
+    setQueryParam('filterLocation', actualLocation);
+    setQueryParam('searchTerm', undefined);
+  };
 
-  // filter chưa xong
-  // const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const newJob = e.target.value;
-  //   setFilterJob(newJob);
-  //   setQueryParam('filterJob', newJob === 'All' ? undefined : newJob);
-  // };
 
   const handlePageChange = (newPage: number) => {
     setQueryParam('page', newPage);
@@ -144,24 +152,18 @@ const handleSort = (key: string) => {
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleSearch}
         />
-        {/* // filter chưa xong */}
-        {/* <select
-          className="filter-select"
-          value={filterJob}
-          onChange={handleFilterChange}
+       <Select
+          value={filterLocation === undefined ? "ALL" : filterLocation}
+          onChange={handleFilterLocationChange}
+          placeholder="Lọc theo địa điểm"
+          style={{ minWidth: 150 }}
+          allowClear 
         >
-          <option value="All">Job: All</option>
-          <option value="A">Job: A</option>
-          <option value="B">Job: B</option>
-          <option value="C">Job: C</option>
-        </select>
-        <button className="add-button" onClick={handleAdd}>
-          {jobOptions.map((job) => (
-            <option key={job} value={job}>
-              Job: {job}
-            </option>
+          <Select.Option key="all-locations" value="ALL">Tất cả địa điểm</Select.Option>
+          {VIETNAM_LOCATIONS.map(loc => (
+            <Select.Option key={loc} value={loc}>{loc}</Select.Option>
           ))}
-        </select> */}
+        </Select>
         <button className="add-button" onClick={handleAdd}>
           Add
         </button>
