@@ -1,5 +1,5 @@
 // src/api/customer.ts
-import apiClient from './index';
+import { api as apiClient } from './auth';
 import type { 
   ApiResponse, 
   CustomerListQuery, 

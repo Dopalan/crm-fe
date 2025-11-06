@@ -27,7 +27,7 @@ const App: React.FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/customers" replace />} />
+        <Route index element={<Navigate to="/login" replace />} />
         <Route path="customers" element={<CustomerList />} />
         <Route path="customers/:customerId" element={<CustomerDetail />} />
       </Route>

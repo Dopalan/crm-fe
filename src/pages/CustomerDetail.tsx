@@ -159,7 +159,7 @@ export default function CustomerDetail() {
                       <Button icon={<PlusOutlined />} onClick={() => console.log('Add Note clicked')}>Add Note</Button>
                   </div>
                   <List
-                    dataSource={customer.notes}
+                    dataSource={customer?.notes || []}
                     renderItem={(item: Note) => (
                       <List.Item>
                         <List.Item.Meta

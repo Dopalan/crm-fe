@@ -3,13 +3,23 @@ import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api/v1";
 
-
 export const api = axios.create({
   baseURL: API_BASE_URL,
-  
 });
 
+// 🟢 Thêm interceptor cho request trước khi gửi
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
+// 🟡 Giữ lại interceptor response như cũ, và thêm refresh token
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -17,8 +27,20 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        
-      } catch {
+        // gọi refresh token API
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (!refreshToken) throw new Error("Missing refresh token");
+
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+        const newAccessToken = response?.data?.metadata?.data?.accessToken;
+
+        if (newAccessToken) {
+          localStorage.setItem("accessToken", newAccessToken);
+          api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return api(originalRequest); // retry request cũ
+        }
+      } catch (e) {
         localStorage.clear();
         window.location.href = "/login";
       }
@@ -26,7 +48,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 
 export async function loginApi(email: string, password: string) {
   try {
@@ -67,8 +88,7 @@ export async function refreshTokenApi() {
 
   if (accessToken) localStorage.setItem("accessToken", accessToken);
   if (newRefresh) localStorage.setItem("refreshToken", newRefresh);
-
-  api.defaults.headers.Authorization = `Bearer ${accessToken}`;
+api.defaults.headers.Authorization = `Bearer ${accessToken}`;
 
   return { accessToken, refreshToken: newRefresh };
 }
