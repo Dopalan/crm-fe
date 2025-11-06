@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { Note } from "../../types/customer";
+import type { Note } from '../../types/note';
 import "../../styles/CustomerNoteForm.css";
 
 interface NoteInput {
@@ -48,7 +48,9 @@ const CustomerNoteForm: React.FC<CustomerNoteFormProps> = ({
       .filter((note) => note.content.trim())
       .map((note) => ({
         content: note.content,
-        author: "Current User", // TODO: Lấy từ auth context
+        authorName: "Current User",
+        customerId: customerId,
+        updatedAt: new Date().toISOString(), 
       }));
 
     if (validNotes.length === 0) {

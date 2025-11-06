@@ -44,6 +44,9 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
             <th onClick={() => onSort('company')}>
               Company {getSortIcon('company')}
             </th>
+            <th onClick={() => onSort('location')}>
+              Location {getSortIcon('location')}
+            </th>
             <th onClick={() => onSort('email')}>
               Email {getSortIcon('email')}
             </th>
@@ -67,6 +70,7 @@ const CustomerTable: React.FC<CustomerTableProps> = ({
                 </div>
               </td>
               <td>{customer.company}</td>
+              <td>{customer.location || '-'}</td>
               <td>{customer.email}</td>
               <td>
                 <div className="action-buttons">

@@ -54,6 +54,7 @@ export const createCustomer = async (
       email: customerData.email || undefined,
       phone: customerData.phone || undefined,
       company: customerData.company,
+      location: customerData.location || undefined, 
       notes: undefined,
       profilePicture: customerData.profilePicture || undefined,
       teamId: 1, // Default team ID
@@ -146,17 +147,3 @@ export const updateCustomerById = async ({ customerId, data }: { customerId: str
   }
 };
 
-export const addCustomerNote = async (
-  customerId: number,
-  content: string
-): Promise<void> => {
-  try {
-    await apiClient.post<ApiResponse<any>>(
-      `${CUSTOMER_URL}/${customerId}/notes`,
-      { content }
-    );
-  } catch (error) {
-    console.error(`Lỗi khi thêm note cho khách hàng ${customerId}:`, error);
-    throw new Error('Không thể thêm ghi chú.');
-  }
-};
