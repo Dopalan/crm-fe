@@ -1,4 +1,3 @@
-// src/api/interaction.ts
 import apiClient from './index';
 import type { ApiResponse, Interaction, InteractionRequest, InteractionUpdateRequest } from '../types';
 
