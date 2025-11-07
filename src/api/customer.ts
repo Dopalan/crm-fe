@@ -54,6 +54,7 @@ export const createCustomer = async (
       email: customerData.email || undefined,
       phone: customerData.phone || undefined,
       company: customerData.company,
+      location: customerData.location || undefined, 
       notes: undefined,
       profilePicture: customerData.profilePicture || undefined,
       teamId: 1, // Default team ID
@@ -106,10 +107,10 @@ export const getFilterOptions = async (): Promise<string[]> => {
 };
 
 // Hàm lấy chi tiết một khách hàng bằng ID
-export const getCustomerById = async (customerId: string): Promise<Customer> => {
+export const getCustomerById = async (customerId: string): Promise<CustomerBE> => {
   try {
-    const response = await apiClient.get<Customer>(`${CUSTOMER_URL}/${customerId}`);
-    
+    const response = await apiClient.get<CustomerBE>(`${CUSTOMER_URL}/${customerId}`);
+
     // Giả sử backend trả về cấu trúc ApiResponse, dữ liệu thật nằm trong ".data"
     // Cần ép kiểu 'any' vì axios response không biết cấu trúc ApiResponse của bạn
     const apiResponse = response.data as any;

@@ -13,6 +13,7 @@ export interface CustomerBE {
   email: string;
   phone: string;
   company: string;
+  location?: string; 
   notes: Note[];
   profilePicture: string;
   teamId: number;
@@ -75,14 +76,6 @@ export interface CustomerListQuery {
 }
 
 
-// "Bản thiết kế" cho một Ghi chú (Note)
-export interface Note {
-  id: string;
-  content: string;
-  author: string;
-  createdAt: string;
-}
-
 // "Bản thiết kế" cho một Khách hàng (Customer) - Dùng cho cả List và Detail
 export interface Customer {
   id: string;
@@ -107,6 +100,7 @@ export interface CustomerRequest {
   email?: string;
   phone?: string;
   company: string;
+  location?: string; 
   notes?: string;
   profilePicture?: string;
   teamId?: number;
@@ -120,6 +114,7 @@ export interface CustomerResponse {
   email?: string;
   phone?: string;
   company: string;
+  location?: string; 
   notes?: string;
   profilePicture?: string;
   teamId: number;
@@ -139,6 +134,7 @@ export interface CustomerRequest {
   email?: string;
   phone?: string;
   company: string;
+  location?: string;
   notes?: string;
   profilePicture?: string;
   teamId?: number;
@@ -152,6 +148,7 @@ export interface CustomerResponse {
   email?: string;
   phone?: string;
   company: string;
+  location?: string;
   notes?: string;
   profilePicture?: string;
   teamId: number;
@@ -166,6 +163,7 @@ export interface CustomerUpdateRequest {
   email: string;
   phone: string;
   company: string;
+  location?: string; 
   profilePicture?: string | null;
 }
 
