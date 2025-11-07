@@ -1,5 +1,4 @@
 // src/types/customer.d.ts
-import type { Interaction } from './interaction';
 
 export interface ApiResponse<T> {
   success: boolean;
