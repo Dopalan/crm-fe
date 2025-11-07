@@ -4,7 +4,9 @@ import type { Interaction } from './interaction';
 export interface ApiResponse<T> {
   success: boolean;
   message: string;
-  data: T;
+  metadata: {
+    data: T; // Dữ liệu thực sự nằm ở đây
+  };
 }
 // CustomerBE = Customer
 export interface CustomerBE {

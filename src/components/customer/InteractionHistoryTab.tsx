@@ -1,12 +1,18 @@
 // src/components/customer/InteractionHistoryTab.tsx
-import React, { useState } from 'react';
-import { Timeline, Empty, Typography, Spin, Alert, Button, Modal, Form, Input, Select, message, Popconfirm } from 'antd';
-import { MailOutlined, PhoneOutlined, CarryOutOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getInteractionsByCustomerIdApi, addInteractionApi, updateInteractionApi, deleteInteractionApi } from '../../api/interaction';
-import type { Interaction, InteractionRequest } from '../../types';
 
-const { Title } = Typography;
+import React, { useState } from 'react';
+import { 
+  Timeline, Empty, Typography, Spin, Alert, Button, Modal, Form, Input, Select, message, Popconfirm, DatePicker, Tag
+} from 'antd';
+import { 
+  EditOutlined, DeleteOutlined, PlusOutlined
+} from '@ant-design/icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import { getInteractionsByCustomerIdApi, addInteractionApi, updateInteractionApi, deleteInteractionApi } from '../../api/interaction';
+import type { Interaction, InteractionRequest, InteractionUpdateRequest } from '../../types/interaction';
+
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -16,12 +22,12 @@ interface InteractionHistoryTabProps {
 
 const interactionTypes: InteractionRequest['type'][] = ['MEETING', 'EMAIL', 'CALL'];
 
-const getIconForType = (type: Interaction['type']) => {
+const getColorForType = (type: Interaction['type']) => {
   switch (type) {
-    case 'EMAIL': return <MailOutlined />;
-    case 'CALL': return <PhoneOutlined />;
-    case 'MEETING': return <CarryOutOutlined />;
-    default: return <CarryOutOutlined />;
+    case 'EMAIL': return 'green';
+    case 'CALL': return 'orange';
+    case 'MEETING': return 'blue';
+    default: return 'default';
   }
 };
 
@@ -33,7 +39,7 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
 
   const { data: interactions, isLoading, isError, error } = useQuery({
     queryKey: ['interactions', customerId],
-    queryFn: () => getInteractionsByCustomerIdApi(customerId),
+    queryFn: () => getInteractionsByCustomerIdApi(Number(customerId)),
     enabled: !!customerId,
   });
 
@@ -45,7 +51,7 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
   };
 
   const addMutation = useMutation({
-    mutationFn: addInteractionApi,
+    mutationFn: (variables: { customerId: number; data: InteractionRequest }) => addInteractionApi(variables.customerId, variables.data),
     onSuccess: () => { message.success("Thêm tương tác thành công!"); onMutationSuccess(); },
     onError: (err: Error) => message.error(err.message),
   });
@@ -64,10 +70,16 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
 
   const handleOpenModal = (interaction: Interaction | null) => {
     setEditingInteraction(interaction);
-    form.setFieldsValue({
-      type: interaction ? interaction.type : 'MEETING',
-      content: interaction ? interaction.content : '',
-    });
+    if (interaction) {
+      form.setFieldsValue({
+        type: interaction.type,
+        description: interaction.description,
+        // ✅ Sửa ở đây: Set giá trị cho trường 'date' của form
+        date: dayjs(interaction.interactionDate),
+      });
+    } else {
+      form.setFieldsValue({ type: 'MEETING', description: '', date: null });
+    }
     setIsModalOpen(true);
   };
 
@@ -76,31 +88,41 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
     setEditingInteraction(null);
     form.resetFields();
   };
-
-  const handleFormSubmit = (values: { type: InteractionRequest['type']; content: string }) => {
-    if (!values.content?.trim()) {
-      message.error("Nội dung không được để trống.");
+  
+  // ✅ Sửa ở đây: Tham số 'values' chỉ chứa những gì có trên form
+  const handleFormSubmit = (values: { type: InteractionRequest['type']; description: string; date: dayjs.Dayjs }) => {
+    if (!values.description?.trim() || !values.date) {
+      message.error("Ngày và mô tả không được để trống.");
       return;
     }
 
-    const requestData: InteractionRequest = { ...values, customerId };
+    // Lấy chuỗi ngày tháng từ 'values.date'
+    const dateString = values.date.format('YYYY-MM-DDTHH:mm:ss');
 
     if (editingInteraction) {
-      updateMutation.mutate({ id: editingInteraction.id, data: requestData });
+      // ✅ Sửa ở đây: Xây dựng payload cho update, với trường 'date'
+      const updateData: InteractionUpdateRequest = {
+        type: values.type,
+        description: values.description,
+        date: dateString,
+      };
+      updateMutation.mutate({ customerId: Number(customerId), id: editingInteraction.id, data: updateData });
     } else {
-      addMutation.mutate(requestData);
+      // ✅ Sửa ở đây: Xây dựng payload cho add, với trường 'interactionDate'
+      const requestData: InteractionRequest = {
+        type: values.type,
+        description: values.description,
+        interactionDate: dateString,
+      };
+      addMutation.mutate({ customerId: Number(customerId), data: requestData });
     }
   };
 
-  if (isLoading) {
-    return <div style={{ textAlign: 'center', padding: '50px' }}><Spin /></div>;
-  }
 
-  if (isError) {
-    return <Alert message="Lỗi" description={(error as Error).message} type="error" showIcon />;
-  }
-
-  const sortedInteractions = interactions ? [...interactions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) : [];
+  if (isLoading) return <div style={{ textAlign: 'center', padding: '50px' }}><Spin /></div>;
+  if (isError) return <Alert message="Lỗi" description={(error as Error).message} type="error" showIcon />;
+  
+  const sortedInteractions = interactions ? [...interactions].sort((a, b) => new Date(b.interactionDate).getTime() - new Date(a.interactionDate).getTime()) : [];
 
   return (
     <div>
@@ -114,18 +136,25 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
       ) : (
         <Timeline>
           {sortedInteractions.map(item => (
-            <Timeline.Item key={item.id} dot={getIconForType(item.type)}>
+            <Timeline.Item key={item.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <div>
-                  <p><strong>{item.content}</strong></p>
-                  <p><small>{item.userName} - {new Date(item.createdAt).toLocaleString()}</small></p>
+                  <Tag color={getColorForType(item.type)}>{item.type}</Tag>
+                  <div style={{ marginTop: '8px' }}>
+                    <Text type="secondary">Description: </Text>
+                    <Text strong>{item.description}</Text>
+                  </div>
+                  <div style={{ marginTop: '4px' }}>
+                     <Text type="secondary">Date: </Text>
+                     <Text>{new Date(item.interactionDate).toLocaleString()}</Text>
+                  </div>
                 </div>
                 <div>
                   <Button type="text" size="small" icon={<EditOutlined />} onClick={() => handleOpenModal(item)} />
                   <Popconfirm
-                    title="Xóa tương tác?"
-                    description="Bạn có chắc muốn xóa tương tác này?"
-                    onConfirm={() => deleteMutation.mutate(item.id)}
+                    title="Delete this interaction?"
+                    description="Are you sure?"
+                    onConfirm={() => deleteMutation.mutate({ customerId: Number(customerId), id: item.id })}
                     okText="Yes"
                     cancelText="No"
                   >
@@ -137,7 +166,7 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
           ))}
         </Timeline>
       )}
-
+      
       <Modal
         title={editingInteraction ? "Edit Interaction" : "Add Interaction"}
         open={isModalOpen}
@@ -155,7 +184,12 @@ export default function InteractionHistoryTab({ customerId }: InteractionHistory
               {interactionTypes.map(type => <Option key={type} value={type}>{type}</Option>)}
             </Select>
           </Form.Item>
-          <Form.Item name="content" label="Content" rules={[{ required: true, message: 'Nội dung không được để trống!' }]}>
+          
+          <Form.Item name="date" label="Interaction Date" rules={[{ required: true, message: 'Ngày không được để trống!' }]}>
+            <DatePicker showTime style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item name="description" label="Description" rules={[{ required: true, message: 'Mô tả không được để trống!' }]}>
             <TextArea rows={4} />
           </Form.Item>
         </Form>
