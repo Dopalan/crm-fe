@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getCustomerList }//, searchCustomers } //  bỏ search 
-from '../api/customer';
-import type { CustomerBE, CustomerListQuery } from '../types/customer.d';
+import { getCustomerList, getCustomerListByLocation }from '../api/customer';
+import type { CustomerBE, CustomerListQuery, SpringPage } from '../types/customer.d';
 
 
 export const useCustomerData = (initialQuery: CustomerListQuery) => {
@@ -16,29 +15,39 @@ export const useCustomerData = (initialQuery: CustomerListQuery) => {
     pageSize: initialQuery.pageSize,
   });
 
-  const fetchCustomers = useCallback(async () => {
+const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
-   try {
+    try {
+      let response: SpringPage<CustomerBE>;
 
+
+      if (query.filterLocation) {
+
+        response = await getCustomerListByLocation(query);
+      } else {
+
+        response = await getCustomerList(query);
+      }
       
-      const response = await getCustomerList(query);
-      
+      // BƯỚC 2: XỬ LÝ KẾT QUẢ (Dùng chung cho cả 2 API)
+      // Vì cả 2 API đều trả về cấu trúc SpringPage<Customer>
       setData(response.content);
       setPagination({
         totalPages: response.totalPages,
         totalElements: response.totalElements,
-        currentPage: response.number, 
+        currentPage: response.number,
         pageSize: response.size,
       });
 
     } catch (err) {
-      setError('Lỗi khi tải dữ liệu khách hàng. Vui lòng thử lại.');
+      const errorMessage = (err as Error)?.message || 'Lỗi khi tải dữ liệu khách hàng. Vui lòng thử lại.';
+      setError(errorMessage);
       setData([]);
     } finally {
       setLoading(false);
     }
-  }, [query]);
+  }, [query]); 
 
   useEffect(() => {
     fetchCustomers();
