@@ -71,6 +71,7 @@ export interface CustomerListQuery {
   sortBy?: string;
   sortDir?: 'asc' | 'desc';
   searchTerm?: string;
+  filterLocation?: string;
 }
 
 

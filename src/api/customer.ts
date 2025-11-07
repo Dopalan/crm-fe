@@ -145,3 +145,27 @@ export const updateCustomerById = async ({ customerId, data }: { customerId: str
     throw new Error(errorMessage);
   }
 };
+
+
+export const getCustomerListByLocation = async (
+  query: CustomerListQuery,
+): Promise<SpringPage<CustomerBE>> => {
+  try {
+    const response = await apiClient.get<ApiResponse<SpringPage<CustomerBE>>>(`${CUSTOMER_URL}/by-location`, {
+      params: {
+        // Tham số bắt buộc cho API này
+        location: query.filterLocation,
+        
+        // Tham số phân trang và sắp xếp
+        page: query.page,
+        size: query.pageSize,
+        sortBy: query.sortBy || 'createdAt',
+        sortDir: query.sortDir || 'desc',
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error('Lỗi khi fetch khách hàng theo location:', error);
+    throw new Error('Không thể tải danh sách khách hàng theo location.');
+  }
+};
