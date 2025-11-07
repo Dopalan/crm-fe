@@ -15,6 +15,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getCustomerById, updateCustomerById } from '../api/customer';
 import type { Customer, CustomerBE, CustomerUpdateRequest } from '../types';
 import CustomerNoteForm from '../components/customer/CustomerNoteForm';
+import InteractionHistoryTab from '../components/customer/InteractionHistoryTab';
 import { addCustomerNote, getCustomerNotes, deleteCustomerNote, updateCustomerNote } from '../api/note';
 import type { Note } from '../types/note.d';
 
@@ -467,11 +468,7 @@ export default function CustomerDetail() {
                   </TabPane>
                   
                   <TabPane tab={<span><HistoryOutlined /> Interaction History</span>} key="interaction">
-                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-                        <Title level={5} style={{ margin: 0 }}>Interaction History</Title>
-                        <Button icon={<PlusOutlined />}>Add Interaction</Button>
-                    </div>
-                    <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No interaction history available." />
+                     {customerId && <InteractionHistoryTab customerId={customerId} />}
                   </TabPane>
 
                   <TabPane tab={<span><ScheduleOutlined /> Schedule</span>} key="schedule">

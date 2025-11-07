@@ -110,7 +110,7 @@ export const getFilterOptions = async (): Promise<string[]> => {
 export const getCustomerById = async (customerId: string): Promise<CustomerBE> => {
   try {
     const response = await apiClient.get<CustomerBE>(`${CUSTOMER_URL}/${customerId}`);
-
+    
     // Giả sử backend trả về cấu trúc ApiResponse, dữ liệu thật nằm trong ".data"
     // Cần ép kiểu 'any' vì axios response không biết cấu trúc ApiResponse của bạn
     const apiResponse = response.data as any;
