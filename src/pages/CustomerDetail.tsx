@@ -470,11 +470,6 @@ export default function CustomerDetail() {
                   <TabPane tab={<span><HistoryOutlined /> Interaction History</span>} key="interaction">
                      {customerId && <InteractionHistoryTab customerId={customerId} />}
                   </TabPane>
-
-                  <TabPane tab={<span><ScheduleOutlined /> Schedule</span>} key="schedule">
-                     <Title level={5} style={{ margin: 0, marginBottom: 24 }}>Schedule</Title>
-                     <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No schedule available." />
-                  </TabPane>
                 </Tabs>
               </Card>
             </Col>
