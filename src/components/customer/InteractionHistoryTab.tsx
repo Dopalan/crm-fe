@@ -1,6 +1,6 @@
 // src/components/customer/InteractionHistoryTab.tsx
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   Timeline, Empty, Typography, Spin, Alert, Button, Modal, Form, Input, Select, message, Popconfirm, DatePicker, Tag
 } from 'antd';

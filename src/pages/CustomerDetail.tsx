@@ -1,19 +1,19 @@
 // src/pages/CustomerDetail.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  Layout, Menu, Button, Avatar, Typography, Row, Col, Card, Tabs, List, Spin, Alert, Empty, Form, Input, message,
+  Layout, Button, Avatar, Typography, Row, Col, Card, Tabs, List, Spin, Alert, Empty, Form, Input, message,
   Space, Modal, Checkbox, Select
 } from 'antd';
 import {
   ArrowLeftOutlined, // ✅ ĐÃ IMPORT THÊM ICON MŨI TÊN
   UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, PlusOutlined,
-  InfoCircleOutlined, MessageOutlined, HistoryOutlined, ScheduleOutlined,
+  MessageOutlined, HistoryOutlined, ScheduleOutlined,
   ApartmentOutlined, DeleteOutlined, EnvironmentOutlined
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getCustomerById, updateCustomerById } from '../api/customer';
-import type { Customer, CustomerBE, CustomerUpdateRequest } from '../types';
+import type { CustomerBE, CustomerUpdateRequest } from '../types';
 import CustomerNoteForm from '../components/customer/CustomerNoteForm';
 import InteractionHistoryTab from '../components/customer/InteractionHistoryTab';
 import { addCustomerNote, getCustomerNotes, deleteCustomerNote, updateCustomerNote } from '../api/note';
@@ -52,7 +52,7 @@ export default function CustomerDetail() {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
 
-  const { data: customer, isLoading, error, refetch } = useQuery<CustomerBE>({
+  const { data: customer, isLoading, error,} = useQuery<CustomerBE>({
     queryKey: ['customer', customerId],
     queryFn: () => getCustomerById(customerId!),
     enabled: !!customerId,

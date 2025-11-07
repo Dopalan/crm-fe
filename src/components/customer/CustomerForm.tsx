@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import type { Customer, CustomerBE } from "../../types/customer";
+import type {CustomerBE } from "../../types/customer";
 import "../../styles/CustomerForm.css";
 
 const VIETNAM_LOCATIONS = [

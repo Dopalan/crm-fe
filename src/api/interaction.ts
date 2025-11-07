@@ -2,8 +2,6 @@
 import apiClient from './index';
 import type { ApiResponse, Interaction, InteractionRequest, InteractionUpdateRequest } from '../types';
 
-const INTERACTION_URL = '/interactions';
-
 // Lấy tất cả tương tác của một khách hàng
 // ✅ SỬA Ở ĐÂY: customerId phải là number
 export const getInteractionsByCustomerIdApi = async (customerId: number): Promise<Interaction[]> => {

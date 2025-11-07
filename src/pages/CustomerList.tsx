@@ -9,7 +9,6 @@ import CustomerForm from '../components/customer/CustomerForm';
 import Pagination from '../components/common/Pagination';
 import '../styles/CustomerList.css'; 
 import { Select} from 'antd';
-import type { Customer } from '../types/customer';
 
 const INITIAL_PAGE_SIZE = 10;
 const VIETNAM_LOCATIONS = [
