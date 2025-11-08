@@ -5,13 +5,8 @@ import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { loginApi } from "../api/auth";
 import { useAuthStore } from "../store/auth";
-
+import { ICON_URL, ILLUSTRATION_URL, FALLBACK_ILLUSTRATION, FALLBACK_ICON } from "../const/string";
 const { Title, Paragraph } = Typography;
-
-const iconUrl = "/src/assets/icon.png";
-const illustrationUrl = "/src/assets/login-illustration.png";
-const fallbackIllustration = "https://i.imgur.com/4AiXzf8.png";
-const fallbackIcon = "https://i.imgur.com/7kJQ8hE.png";
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -151,9 +146,9 @@ const Login: React.FC = () => {
               <div className="brand" style={{ alignItems: "flex-start" }}>
                 <div className="brand-icon" title="Logo">
                   <img
-                    src={iconUrl}
+                    src={ICON_URL}
                     alt="logo"
-                    onError={(e: any) => (e.currentTarget.src = fallbackIcon)}
+                    onError={(e: any) => (e.currentTarget.src = FALLBACK_ICON)}
                   />
                 </div>
 
@@ -244,9 +239,9 @@ const Login: React.FC = () => {
             <div className="right" aria-hidden>
               <img
                 className="illustration"
-                src={illustrationUrl}
+                src={ILLUSTRATION_URL}
                 alt="illustration"
-                onError={(e: any) => (e.currentTarget.src = fallbackIllustration)}
+                onError={(e: any) => (e.currentTarget.src = FALLBACK_ILLUSTRATION)}
               />
             </div>
           </div>
