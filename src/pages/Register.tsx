@@ -18,15 +18,20 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
 
+  // thêm form instance để set lỗi field
+  const [form] = Form.useForm();
+
   const onFinish = async (values: any) => {
     setLoading(true);
+    // trước khi gửi, xóa lỗi field username cũ (nếu có)
+    form.setFields([{ name: "username", errors: [] }]);
+
     try {
       // Lấy và trim input
       const fullname = (values.fullname || "").trim();
-      const username = (values.username || "").trim(); 
+      const username = (values.username || "").trim();
       const password = values.password;
 
-      
       await registerApi(fullname, username, password);
 
       if (authStore?.register) authStore.register();
@@ -34,10 +39,35 @@ const Register: React.FC = () => {
       message.success("Đăng ký thành công! Vui lòng đăng nhập.");
       navigate("/login");
     } catch (err: any) {
-      const errMsg =
-        err?.response?.data?.message || err?.message || "Đăng ký thất bại, vui lòng thử lại";
       console.error("Register error:", err);
-      message.error(errMsg);
+
+      // cố gắng phát hiện lỗi email đã tồn tại từ server
+      const status = err?.response?.status;
+      const respMsg = err?.response?.data?.message || err?.message || "";
+      const respCode = err?.response?.data?.code;
+
+      // điều kiện nhận diện lỗi email trùng — bạn có thể mở rộng tuỳ API backend
+      const isDuplicateEmail =
+        status === 409 || // nếu backend trả 409 Conflict cho duplicate
+        (typeof respCode === "string" && /email.*exist|EMAIL_EXISTS|DUPLICATE/i.test(respCode)) ||
+        (typeof respMsg === "string" &&
+          /email.*(exist|exists|đã tồn tại|đã được đăng ký|đã đăng ký)/i.test(respMsg));
+
+      if (isDuplicateEmail) {
+        // hiển thị message chung
+        message.error("Email này đã được đăng ký trước đó. Vui lòng sử dụng email khác hoặc đăng nhập.");
+
+        // đặt lỗi cho field username trong Form
+        form.setFields([
+          {
+            name: "username",
+            errors: ["Email này đã được đăng ký"],
+          },
+        ]);
+      } else {
+        const errMsg = respMsg || "Đăng ký thất bại, vui lòng thử lại";
+        message.error(errMsg);
+      }
     } finally {
       setLoading(false);
     }
@@ -199,6 +229,7 @@ const Register: React.FC = () => {
 
               <div className="form-box" style={{ marginTop: 12 }}>
                 <Form
+                  form={form}
                   name="register_form"
                   layout="vertical"
                   onFinish={onFinish}
@@ -215,11 +246,7 @@ const Register: React.FC = () => {
                     name="fullname"
                     rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
                   >
-                    <Input
-                      size="large"
-                      placeholder="Nhập họ và tên"
-                      prefix={<UserOutlined />}
-                    />
+                    <Input size="large" placeholder="Nhập họ và tên" prefix={<UserOutlined />} />
                   </Form.Item>
 
                   <Form.Item
@@ -235,11 +262,7 @@ const Register: React.FC = () => {
                       { type: "email", message: "Email không hợp lệ" },
                     ]}
                   >
-                    <Input
-                      size="large"
-                      placeholder="Nhập email"
-                      prefix={<MailOutlined />}
-                    />
+                    <Input size="large" placeholder="Nhập email" prefix={<MailOutlined />} />
                   </Form.Item>
 
                   <Form.Item
@@ -271,10 +294,7 @@ const Register: React.FC = () => {
 
                   <div className="actions-row">
                     <span>Bạn đã có tài khoản?</span>
-                    <div
-                      className="link-muted"
-                      onClick={() => navigate("/login")}
-                    >
+                    <div className="link-muted" onClick={() => navigate("/login")}>
                       Đăng nhập
                     </div>
                   </div>

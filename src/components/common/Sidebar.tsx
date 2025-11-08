@@ -20,13 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onLogout, loading }) => {
           <span>Home</span>
         </NavLink>
 
-        <NavLink to="/favorites" className="sidebar-link">
-          <FaStar />
-        </NavLink>
-
-        <NavLink to="/explore" className="sidebar-link">
-          <FaHashtag />
-        </NavLink>
+       
       </nav>
 
       {/* 👇 Nút logout gọi hàm onLogout từ props */}

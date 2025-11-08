@@ -4,7 +4,7 @@ import axios from 'axios';
 
 
 
-const API_BASE_URL = 'https://cnpmnc-pk6u.onrender.com/api/v1';
+const API_BASE_URL = 'https://cnpmnc.onrender.com/api/v1';
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {

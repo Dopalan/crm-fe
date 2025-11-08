@@ -7,7 +7,7 @@ import {
 import {
   ArrowLeftOutlined, // ✅ ĐÃ IMPORT THÊM ICON MŨI TÊN
   UserOutlined, MailOutlined, PhoneOutlined, EditOutlined, PlusOutlined,
-  MessageOutlined, HistoryOutlined, ScheduleOutlined,
+  MessageOutlined, HistoryOutlined, 
   ApartmentOutlined, DeleteOutlined, EnvironmentOutlined
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -471,10 +471,7 @@ export default function CustomerDetail() {
                      {customerId && <InteractionHistoryTab customerId={customerId} />}
                   </TabPane>
 
-                  <TabPane tab={<span><ScheduleOutlined /> Schedule</span>} key="schedule">
-                     <Title level={5} style={{ margin: 0, marginBottom: 24 }}>Schedule</Title>
-                     <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No schedule available." />
-                  </TabPane>
+                 
                 </Tabs>
               </Card>
             </Col>

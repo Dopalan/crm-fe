@@ -1,7 +1,7 @@
 // src/api/auth.ts
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://cnpmnc-pk6u.onrender.com/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://cnpmnc.onrender.com/api/v1";
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -53,25 +53,42 @@ export async function loginApi(email: string, password: string) {
   try {
     const response = await api.post("/auth/login", { email, password });
 
-    const metadataData = response?.data?.metadata?.data ?? null;
+    const metadataData = response?.data?.metadata?.data;
 
-    if (!metadataData) {
-      throw new Error(response?.data?.message || "Đăng nhập thất bại");
+    // ❗ Nếu backend trả message lỗi nhưng status 200
+    // => vẫn phải QUĂNG lỗi, không được coi là login thành công
+    if (!metadataData?.accessToken) {
+      throw {
+        response: {
+          status: response?.status ?? 400,
+          data: { message: response?.data?.message || "Sai tên đăng nhập hoặc mật khẩu" }
+        }
+      };
     }
 
+    // ✅ Lưu token CHỈ KHI ĐĂNG NHẬP THÀNH CÔNG
     const { accessToken, refreshToken } = metadataData;
 
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
-      api.defaults.headers.Authorization = `Bearer ${accessToken}`;
+    localStorage.setItem("accessToken", accessToken);
+    if (refreshToken) {
+      localStorage.setItem("refreshToken", refreshToken);
     }
 
-    return metadataData; 
+    api.defaults.headers.Authorization = `Bearer ${accessToken}`;
+
+    return metadataData;
+
   } catch (error: any) {
-    const message =
-      error?.response?.data?.message || error?.message || "Đăng nhập thất bại, vui lòng thử lại";
-    throw new Error(message);
+
+    // ✅ LỖI BACKEND ĐÚNG CHUẨN (401/404...)
+    if (error?.response) {
+      const message = error.response.data?.message || "Sai tên đăng nhập hoặc mật khẩu";
+      const status = error.response.status;
+      throw { message, status };
+    }
+
+    // ✅ LỖI KHÁC
+    throw { message: error.message || "Đăng nhập thất bại", status: 500 };
   }
 }
 

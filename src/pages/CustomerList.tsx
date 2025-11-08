@@ -132,7 +132,7 @@ const handleSort = (key: string) => {
       
     } catch (error: any) {
       console.error('Error creating customer:', error);
-      alert(`An error occurred while adding the customer: ${error.message}`);
+      alert(` ${error.message}`);
     }
   };
 

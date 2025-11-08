@@ -18,29 +18,46 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const authStore = useAuthStore();
 
+  // ✅ thêm form instance
+  const [form] = Form.useForm();
+
   const onFinish = async (values: any) => {
     setLoading(true);
+
+    // ✅ reset lỗi cũ trước khi submit
+    form.setFields([
+      { name: "username", errors: [] },
+      { name: "password", errors: [] },
+    ]);
+
     try {
-     
       const email = (values.username || "").trim();
       const password = values.password;
 
-     
       const data = await loginApi(email, password);
-      
 
       const accessToken = data?.accessToken ?? null;
       const user = data?.user ?? null;
 
-     
       authStore.login({ token: accessToken, user });
 
       message.success("Đăng nhập thành công");
-      
       navigate("/customers");
     } catch (err: any) {
-      const errMsg = err?.message || "Tên đăng nhập hoặc mật khẩu không đúng";
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Tên đăng nhập hoặc mật khẩu không đúng";
+
       message.error(errMsg);
+
+      // ✅ gán lỗi trực tiếp vào field
+      form.setFields([
+        {
+          name: "username",
+          errors: ["Email không tồn tại"],
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -120,7 +137,7 @@ const Login: React.FC = () => {
           transition: all 0.25s ease;
         }
         .btn-login:hover { background: #1677ff; color: #fff; }
-        .actions-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+        .actions-row { display: flex; justify-content: center; align-items: center; margin-top: 8px; }
         .link-muted { color: #1677ff; text-decoration: none; cursor: pointer; }
         .right {
           width: 52%;
@@ -174,6 +191,7 @@ const Login: React.FC = () => {
 
               <div className="form-box" style={{ marginTop: 12 }}>
                 <Form
+                  form={form}  // ✅ thêm form vào đây
                   name="login_form"
                   layout="vertical"
                   onFinish={onFinish}
@@ -224,12 +242,6 @@ const Login: React.FC = () => {
                   </Form.Item>
 
                   <div className="actions-row">
-                    <div
-                      className="link-muted"
-                      onClick={() => message.info("Chức năng quên mật khẩu")}
-                    >
-                      Quên mật khẩu?
-                    </div>
                     <div
                       className="link-muted"
                       onClick={() => navigate("/register")}
