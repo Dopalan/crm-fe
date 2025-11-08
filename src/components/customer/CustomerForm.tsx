@@ -174,7 +174,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSubmit, onCancel }) => {
               type="url"
               value={customerData.profilePicture || ''}
               onChange={(e) => handleChange('profilePicture', e.target.value)}
-              placeholder="https://example.com/avatar.jpg"
+              placeholder={customerData.profilePicture }
             />
           </div>
           </div>

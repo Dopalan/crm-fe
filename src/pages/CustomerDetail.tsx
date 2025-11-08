@@ -69,6 +69,7 @@ export default function CustomerDetail() {
       message.error(err.message);
     }
   });
+     
 
   useEffect(() => {
   if (isEditing && customer) {
@@ -78,7 +79,7 @@ export default function CustomerDetail() {
       location: (customer as any).location ?? '',
       email: (customer as any).emailAddress ?? (customer as any).email ?? '',
       phone: (customer as any).phoneNumber ?? (customer as any).phone ?? '',
-      profilePicture: (customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? '',
+      profilePicture: (customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? `https://i.pravatar.cc/30?u=${customer.id}`,
     });
   }
 }, [isEditing, customer, form]);
@@ -277,7 +278,7 @@ export default function CustomerDetail() {
                   <div style={{ textAlign: 'center', paddingTop: '24px' }}>
                     <Avatar
                       size={96}
-                      src={(customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? undefined}
+                      src={(customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? `https://i.pravatar.cc/30?u=${customer.id}`}
                       icon={<UserOutlined />}
                     />
                     <Title level={4} style={{ marginTop: 16, marginBottom: 0 }}>
@@ -297,7 +298,7 @@ export default function CustomerDetail() {
                   <div style={{ textAlign: 'center', marginBottom: 24 }}>
                     <Avatar
                       size={96}
-                      src={(customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? undefined}
+                      src={(customer as any).profilePictureUrl ?? (customer as any).profilePicture ?? `https://i.pravatar.cc/30?u=${customer.id}`}
                       icon={<UserOutlined />}
                     />
                   </div>
@@ -328,7 +329,8 @@ export default function CustomerDetail() {
                     <Input />
                   </Form.Item>
                   <Form.Item name="profilePicture" label="Profile Picture URL">
-                    <Input placeholder="https://example.com/image.png" />
+                    <Input placeholder="https://example.com/image.png" /> 
+                    {/* <Input placeholder={customer.profilePicture || `https://i.pravatar.cc/30?u=${customer.id}`} /> */}
                   </Form.Item>
                   <Form.Item style={{ textAlign: 'right', marginTop: 24, marginBottom: 0 }}>
                     <Button onClick={handleCancel} style={{ marginRight: 8 }}>Cancel</Button>
